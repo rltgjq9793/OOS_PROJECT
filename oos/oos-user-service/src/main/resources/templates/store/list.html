@@ -1,0 +1,296 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/shopLayout}">
+
+<div layout:fragment="container">
+
+<link href="/css/tag.css" type="text/css" rel="stylesheet" />
+	<div class="container" style="margin-top: 20px;">
+		<div class="menuRoot">
+			<div class="table-cell" style="">
+				<span class="storeBigCategoryName" style="color: #9b9b9b;">매장홈</span><span
+					style="color: #9b9b9b;">&nbsp;&nbsp;&nbsp; &gt; &nbsp;&nbsp;</span><span
+					class="selectedMypageMenu selectedStoreName" th:text="${store.sname}">SNAME</span>
+			</div>
+		</div>
+
+		<div class="store_container">
+			<div style="width:1000px; margin:0 auto">
+				<div style="display: inline-block; overflow:hidden; height:200px;">
+					<img id="storeImg"
+					style="display: block;width:auto; width:350px">
+				</div>
+				<div class="main_store_info">
+					<div style="font-size: 17px; color: #9b9b9b; margin-bottom: 6px;"
+						th:text="${store.saddress}">ADDRESS</div>
+					<div
+						style="font-size: 40px; color: #333; font-weight: bold; line-height: 1.0; margin-bottom: 15px;"
+						th:text="${store.sname}">SNAME</div>
+					<div
+						style="font-size: 17px; color: #333; line-height: 1.0; margin-bottom: 30px;"
+						th:text=${store.tel}>TEL</div>
+						
+					<div class="tradeBtnWrapClass" style="position: relative;">
+						<button class="storeHomeTradeBtn">
+							<div class="tradeBtnImg"></div>
+							<span class="tradeStatusBtn">+ 찜리스트 추가</span>
+						</button>
+					</div>
+					<div style="padding:15px;">
+						<span class="tag tag-pink" style="margin-right:5px;"
+						th:each="arr : ${storeTag}" th:text="|#${arr.tag}|">Pink tag</span>
+					</div>
+					<div style="line-height: 1.0 position:relative;">
+						<span style="color: #9b9b9b; font-size: 14px; margin-right: 5px;">찜목록 추가수</span><span
+							class="store_info_text" style="margin-right: 15px;" th:text="${store.likeNum}"></span><span
+							style="color: #9b9b9b;">|</span><span
+							style="color: #9b9b9b; font-size: 14px; margin-left: 15px; margin-right: 5px;">물품</span><span
+							class="store_info_text" style="margin-right: 15px;" th:text="${store.pdNum}"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div style="position: relative; margin-top: 80px; width: 100%;">
+			
+			<div class="sortMethodSelect"
+				style="margin-top: 40px; font-size: 13px; margin-right: 386px;">
+				<div id="sortMethod_0" class="sortMethodClass selected">최신순</div>
+				<div class="breakPoint">∙</div>
+				<div id="sortMethod_1" class="sortMethodClass">높은가격순</div>
+				<div class="breakPoint">∙</div>
+				<div id="sortMethod_2" class="sortMethodClass">낮은가격순</div>
+			</div>
+		</div>
+		<div class="div_line_grey_2px"
+			style="margin-top: 16px; margin-bottom: 16px;"></div>
+	</div>
+
+	<div style="width: 1100px; margin: 0 auto; position: relative;">
+		<ul id="goodsList"
+			style="list-style: outside none none; padding: 0px; position: relative; overflow: hidden;">
+			<ul class="goods_ul" th:each="arr :${product}">
+					<input type="hidden" th:id="|sno_${arr.sno}|">
+					<li class="goodsContainer"  style="margin-right: 5px;" th:id="|link_${arr.pno}|">
+						<div class="goodsImg" style="overflow:hidden;position: relative; width: 270px; height: 353px;">
+							<img th:id="|img_${arr.pno}|" class="productImg" style="width:100%; display:block;">		
+						</div>
+						<div class="goodsInfo" style="position: relative;">
+							<div class="goodsName" th:text="${arr.pname}" style="">PNAME</div>
+							<div class="storeLocation"
+								style="font-size: 13px; color: #9b9b9b; margin-top: 4px;"
+								th:text="${store.sname}">SNAME</div>
+						</div>
+						<div style="margin: 0 15px;">
+							<span style="float: left; font-size: 12px; margin-top: 7px;"><img
+								class="zzimImg" src="/img/card_zzim_off_btn.png">28</span><span
+								style="float: right; font-size: 20px; font-weight: bold; margin-top: 7px;"
+								th:text="${arr.price}">PRICE</span>
+						</div> 
+						<span class="mouseOverBorder"></span>
+					</li>
+			</ul>
+		</ul>
+		<div class="notListMsg"></div>
+		<form id="storeForm">
+			<input type='hidden' name='amount' value='12'/>
+			<input type='hidden' id='pageNum' name='pageNum'/>
+			<input type='hidden' name='sno' id="sno" th:value="${store.sno}"/>
+		</form>
+	</div>
+	<span id="secName" sec:authentication="name" style="display:none"></span>
+	<div style="text-align:center;" th:if="${#lists.size(pageList) gt 1}">
+		<div class="pageControlLeft" th:if="${pageMaker.prev} == true"></div>
+		<div class="showPage" style="display:inline-block; vertical-align:top;"  th:each="page : ${pageList}">
+			<button class="pageNum pageNumber" th:id="|page_${page}|" th:text="${page}">1</button></div>
+		<div class="pageControlRight" th:if="${pageMaker.next} == true"></div>
+	</div>
+
+</div>
+
+<th:block layout:fragment="script">
+<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			var storeForm = $("#storeForm");
+			var pageMaker = [[${pageMaker}]]
+			var goodsImg=[[${product}]];
+			var store=[[${store}]];
+			var popupList =[[${popupList}]];
+			
+	 		(function(){
+	 			
+	 			if($("#secName").html() != "anonymousUser"){
+					mid = $("#secName").html();
+				}
+	 			
+				$.each(goodsImg, function(index, item){
+					var img = item.imgList[0];
+					
+					var fileCallPath =  encodeURIComponent(img.ipath+ "/"+ img.uuid +"_"+img.iname);
+					
+					var imgDiv= $('#img_'+item.pno);
+					imgDiv.attr("src","/display?fileName="+fileCallPath); 
+				}); 
+				
+				if(mid != undefined){
+					$.ajax({
+						type:"post",
+						url:"/store/checkzzim/"+$("#sno").val(),
+				        success:function(result,status,xhr){
+							if(result == "yes"){
+								$(".storeHomeTradeBtn").addClass("on");
+							}else if(result == "no"){
+								$(".storeHomeTradeBtn").removeClass("on");						
+							}
+						},
+					});
+				}
+				 
+				var fileCallPath =  encodeURIComponent(store.imgList[0].ipath+ "/"+
+							store.imgList[0].uuid +"_"+store.imgList[0].iname); 
+				 
+				$('#storeImg').attr("src","/display?fileName="+fileCallPath); 
+		
+				
+				$("#pageNum").val(pageMaker.cri.pageNum);
+				$("#page_"+pageMaker.cri.pageNum).attr("style","color:#ff7f7a;");
+					
+				if(pageMaker.cri.pageNum!=1){
+					return;
+				}
+				
+				var cookieList = function(cookieName) {
+					
+					var cookie = $.cookie(cookieName);
+					var items = cookie ? cookie.split(/,/) : new Array();
+
+					return {
+					    "add": function(val) {
+					        items.push(val);
+					        $.cookie(cookieName, items.join(','),{ expires: 1});
+					    },
+					    "remove": function (val) { 
+					        
+					        indx = items.indexOf(val); 
+					        if(indx!=-1) items.splice(indx, 1); 
+					        $.cookie(cookieName, items.join(','));
+						 },
+					    "clear": function() {
+					        items = null;
+					        $.cookie(cookieName, null);
+					    },
+					    "items": function() {
+					        
+					        return items;
+					    }
+					  }
+					}  
+				 											
+				//cookieList("popupOpen");
+				
+					var cookieValue=cookieList("popupOpen").items();
+			 	
+					cookieValue.filter((value, idx, arr) => arr.indexOf(value) === idx);
+				
+					 var result=true;
+					 $.each(cookieValue,function(i,item){
+					 				
+					if(store.sno == item){
+						result=false;
+						return false;
+					}
+				
+				});
+				 
+				 if(result==true){
+					 if(popupList.length == 0){
+						 return;
+					 }else{
+				    	var popOption = "width=500, height=700, resizable=no, location=no, scrollbars=no, status=no;"; //팝업창 옵션(optoin)
+						var sid = [[${store.owner}]];
+						window.open("/store/popupList?sid="+sid, "store", popOption);   
+					 }		
+				 }
+				 
+			 	
+				if(mid != undefined){
+					$.ajax({
+						type:"post",
+						url:"/store/checkzzim/"+store.sno,
+						beforeSend: function(xhr) {
+				            xhr.setRequestHeader(header, token);
+				        },
+				        success:function(result,status,xhr){
+							if(result == "yes"){
+								$(".storeHomeTradeBtn").addClass("on");
+								$(".tradeStatusBtn").html("찜리스트 추가됨");
+							}else if(result == "no"){
+								$(".storeHomeTradeBtn").removeClass("on");						
+							}
+						},
+					});
+				}
+
+			})(); 
+			
+			$(".storeHomeTradeBtn").click(function(){
+				if(mid == null){
+					alert("로그인 후 이용할 수 있습니다.");
+					return;
+				}
+				
+				$.ajax({
+					type:"post",
+					url:"/user/zzim/"+store.sno,
+					beforeSend: function(xhr) {
+			            xhr.setRequestHeader(header, token);
+			        },
+			        success:function(result,status,xhr){
+						if(result == "insert"){
+							$(".storeHomeTradeBtn").addClass("on");
+							$(".tradeStatusBtn").html("찜리스트 추가됨");
+						}else if(result == "delete"){
+							$(".storeHomeTradeBtn").removeClass("on");
+
+							$(".tradeStatusBtn").html("+ 찜리스트 추가");
+						}
+					},
+				});
+			});			
+			
+			$(".pageControlLeft").click(function(){
+				$("#pageNum").val(Number(pageMaker.startPage) -1);
+				storeForm.submit();
+			});
+			
+			$(".pageControlRight").click(function(){
+				$("#pageNum").val(Number(pageMaker.endPage) + 1);
+				storeForm.submit();
+			});
+			
+			$(".goodsContainer").click(function(e){
+				var pno = $(this).attr("id").substring(5);
+				var sno = $(this).prev("input").attr("id").substring(4);
+				storeForm.append("<input type='hidden' name='pno' value='"+pno+"'>");
+				storeForm.append("<input type='hidden' name='sno' value='"+sno+"'>");
+				storeForm.attr("action","/store/detail").submit();
+			});
+			
+			$(".sortMethodClass").click(function(e) {
+                var val = $(this).attr("id").substring(11);
+                storeForm.append("<input type='hidden' name='orderby' value='"+val+"'>");
+                storeForm.attr("action", "/store/list").submit();
+            });
+			
+			$(".pageNum").click(function(e) {
+				$("#pageNum").val($(this).attr("id").substring(5));
+				storeForm.submit();
+			});
+		
+									
+		});
+	</script>
+</th:block>
+</html>

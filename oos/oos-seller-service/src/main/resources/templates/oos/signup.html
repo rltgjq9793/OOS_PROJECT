@@ -1,0 +1,317 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="utf-8">
+
+<title>신상마켓 :: No.1 패션 B2B 플랫폼</title>
+<link rel="stylesheet"
+	href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="/js/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link href="/css/nanumbarungothic.css" type="text/css" rel="stylesheet">
+<link href="/css/common.css" type="text/css" rel="stylesheet">
+<link href="/css/userAdd.css" type="text/css" rel="stylesheet">
+<link href="/css/custom_bootstrap.css" type="text/css" rel="stylesheet" />
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<style>
+input[type="checkbox"], input[type="radio"]{
+	display:unset;
+}
+.personalTd{
+	border:none
+}
+</style>
+<body>
+	<form id="signupForm" action="/oos/signup" method="post" name="form">
+		
+		<div class="wishlistArea"
+			style="position: relative;left: 225px; width: 800px; margin-bottom: 68px; min-height: 600px;">
+		<input type='hidden' th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+		<input type='hidden' name="authList[0]" value="USER" />
+		<input type='hidden' name="pnum" id="pnumResult"/>
+			<table class="basketGoodsTableEnd" style="width: 760px;  border-top: 4px solid #e5e5e5;">
+				<div style="margin:0 auto; width:430px; padding: 20px 0">
+					<img src="/img/oos_logo.jpg" style="width: 300px; margin: 20px auto; display:block; ">
+					<img src="/img/step1.png">
+				</div>
+				<tbody>
+					<tr>
+						<td class="personalTd headTitle" style="">회원 아이디</td>
+						<td class="personalTd" style="position: relative;">
+						<input class="orderInfo" type="text" name="mid" maxlength="15" id="mid">
+						<button class="basketSwapBtn idCheck" 
+							 style="background: #ff7f7a; color:#fff; width:65px; height:30px;">중복검사</button>
+							 <span id="failID"></span></td>
+					</tr>
+					<tr>
+						<td class="personalTd headTitle" style="">회원 비밀번호</td>
+						<td class="personalTd" style="position: relative;">
+						<input type="password" id="pw1" name="mpw" maxlength="20" class="orderInfo"></td>
+					</tr>
+					<tr>
+						<td class="personalTd headTitle" style="">비밀번호 확인</td>
+						<td class="personalTd" style="position: relative;">
+						<input type="password" id="pw2" maxlength="20" class="orderInfo">
+						<span id="failPW"></span></td>
+					</tr>
+					<tr>
+						<td class="personalTd headTitle" style="">실명</td>
+						<td class="personalTd" style="position: relative;">
+						<input class="orderInfo" type="text" name="mname" id="mname" value="김김김">
+						 <span id="failMNAME"></span></td>
+					</tr>
+					<tr>
+						<td class="personalTd headTitle" style="">휴대폰 번호</td>
+						<td class="personalTd" style="position: relative;">
+						<div style="margin:10px 0 0 3px">
+							<select class="addressInfo" id="pnum" style="width:60px;"> 
+								<option value="010">010</option> 
+								<option value="011">011</option> 
+								<option value="016">016</option> 
+								<option value="019">019</option> 
+							</select> 
+							<span class="dash">-</span> 
+							<input type="text" style="width:35px;" maxlength="4" class="addressInfo" id="pnum2"
+												onkeydown="onlyNumber(event)" onkeyup="removeChar(event)" value="1234"> 
+							<span class="dash">-</span> 
+							<input type="text" style="width:35px;" maxlength="4" class="addressInfo" id="pnum3"
+												onkeydown="onlyNumber(event)" onkeyup="removeChar(event)" value="5678">
+						</div>
+						<span id="failPHONE"></span>
+						</td>
+					</tr>
+					<tr>
+						<td class="personalTd headTitle" style="">생년월일</td>
+						<td class="personalTd" style="position: relative;">
+						<input type="hidden" name="birth">
+						<select id="year" class="orderInfo">
+							<option value="">- 년 -</option>
+						</select>
+						<select id="month" class="orderInfo">
+							<option value="">- 월 -</option>
+						</select>
+						<select id="day" class="orderInfo">
+							<option value="">- 일 -</option>
+						</select>
+						<input type="hidden" maxlength="20" id="birth" name="birth">
+						<span id="failBIRTH"></span>
+						</td>
+					</tr>
+					<tr>
+						<td class="personalTd headTitle" style="">이메일</td>
+						<td class="personalTd" style="position: relative;">
+						<input type="hidden" id="email" name="email">
+						<input type="text" class="orderInfo"  id="email1" size="15" value="test"> @ 
+						<input type="text" class="orderInfo" id="email2" size="20">
+							<select class="orderInfo"  id="email_select" onChange="javascript:checkemailaddy();">
+							    <option value="" selected>선택하세요</option>
+							    <option value="naver.com">naver.com</option>
+							    <option value="daum.net">daum.net</option>
+							   <option value="gmail.com">gmail.com</option>
+							    <option value="1">직접입력</option>
+							</select><br/>
+							<span id="failEMAIL"></span>
+						</td>	
+						<script>
+						function checkemailaddy(){
+					        if ($("#email_select").val() == '1') {
+					        	$("#email_select").attr("readonly","readonly");
+					        	$("#email_select").val() == "";
+					        	$("#email_select").focus();
+					        }
+					        else {
+					        	$("#email2").attr("readonly","readonly");
+					        	$("#email2").val($("#email_select").val());
+					        }
+					    }
+						</script>
+					</tr>
+					<tr>
+						<td class="personalTd headTitle" style="">주소</td>			
+						<td class="personalTd">
+							<input style="width: 80px;" class="orderInfo addressInfo" 
+								id="roadAddr1" type="text" readonly="readonly"> 
+							 <button class="basketSwapBtn adressSearch" 
+							 style="background: #ff7f7a; color:#fff; width:65px; height:30px;">주소검색</button>
+							 <br>
+							 <input class="orderInfo addressInfo" type="text" name="address" 
+							 	value="서울 강남구 양재천로 169" id="roadAddr2"><span id="failADDRESS"></span>				 
+							 <br>
+							 <input type="text" class="orderInfo addressInfo" maxlength="15" name="addressdetail"
+							placeholder="상세 주소를 입력해주세요" value="101동" id="roadAddr3">
+							<span id="failDETAIL"></span>
+						</td>
+					</tr>
+					
+				</tbody>
+				
+				<table cellspacing="0" style=" width: 760px; height: 50px; margin-top:10px;">
+					<tbody>
+						<tr style="width: 800px;">
+							<td class="orderListTab basket1 active" id="signupBtn"
+								style="background:#ff7f7a;border-right: 1px solid #e4e4e4;">회원가입</td>
+						</tr>
+					</tbody>
+				</table>
+				
+			</table>				
+		</div>	
+	</form>
+</body>
+<th:block layout:fragment="script">
+	<script src="/js/function.js" type="text/javascript"></script>
+	<script th:inline="javascript" src="http://dmaps.daum.net/map_js_init/postcode.v2.js?autoload=false"></script>
+	<script th:inline="javascript">
+	$(document).ready(function(){
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		var signupForm = $("#signupForm");
+		var idCheck = "fail"
+		var successID;
+		var mid;
+		
+		(function(){
+			appendYear();
+			appendMonth();
+			appendDay();
+		})();
+		
+		$("#signupBtn").click(function(e){
+			e.preventDefault();
+			if(mid != successID){
+				$("#failID").html("아이디 중복확인을 해주세요");
+				return;
+			}
+			
+			signupCheck("mname", "실명","failMNAME");
+			signupCheckDouble("email1", "email2", "이메일", "failEMAIL");
+			signupCheck("roadAddr2", "주소", "failADDRESS");
+			signupCheck("roadAddr3", "상세주소", "failDETAIL");
+			signupCheckDouble("pnum2","pnum3", "핸드폰 번호", "failPHONE");
+			signupCheckDouble("year","day", "생년월일", "failBIRTH");
+			signupCheckDouble("day","month", "생년월일", "failBIRTH");
+			
+			if($("#pw1").val() != $("#pw2").val()){
+				$("#failPW").html("비밀번호가 서로 다릅니다");
+				throw "stop";
+			}
+			
+			var pnum = String($("#pnum").val()) + 
+							String($("#pnum2").val()) + String($("#pnum3").val());
+			
+			var email = $("#email1").val() + "@" + $("#email2").val();
+			
+			var birth = $("#year").val() + "/" + 
+			$("#month").val() + "/" + $("#day").val();
+			
+			$("#email").val(email);
+			$("#pnumResult").val(pnum);
+			$("#birth").val(birth);
+			$("#signupForm").submit();
+		});
+		
+		$(".adressSearch").click(function(e){
+			e.preventDefault();
+			daum.postcode.load(function(){
+		        new daum.Postcode({
+		            oncomplete: function(data) {
+		            	address(data);
+		            }
+		        }).open();
+		    });
+		});
+		
+		function signupCheck(id, string, fail){
+			if($("#"+id).val().length == 0){
+				$("#"+fail).html(string+"를(을) 입력해주세요");
+				throw "stop";
+			}
+			
+		}
+		
+		function signupCheckDouble(id1, id2, string, fail){
+			if($("#"+id1).val().length == 0 || $("#"+id2).val().length == 0){
+				$("#"+fail).html(string+"를(을) 입력해주세요");
+				throw "stop";
+			}
+			
+		}
+		
+		function popupOpen(popUrl){
+			var popOption = "width=400, height=500, resizable=no, scrollbars=no, status=no;";    //팝업창 옵션(optoin)
+			window.open(popUrl,"",popOption);
+		}
+		
+		$(".idCheck").click(function(e){
+			e.preventDefault();
+			mid = $("#mid").val();
+			$.ajax({
+				type:"post",
+				url:"/oos/idCheck/"+mid,
+				beforeSend: function(xhr) {
+		            xhr.setRequestHeader(header, token);
+		        },
+				success: function(result, status, xhr){
+					if(result == "SUCCESS"){
+						alert("사용해도 되는 아이디입니다.");
+						idCheck = "true";
+						successID = mid;
+					}else if(result == "FAIL"){
+						alert('중복입니다. 다른 아이디를 입력해주세요.');
+						idCheck = "fail";
+					}
+				},
+				error: function(xhr,status, er){
+					if(error){
+						error(er);
+					}
+				}	
+			});
+		});
+		
+		function address(data){
+			$("#roadAddr1").val(data.postcode);
+			$("#roadAddr2").val(data.roadAddress);
+			$("#roadAddr3").val("");
+		}
+		
+		function appendYear(){
+			var date = new Date();
+			var optionIndex = 0;
+			for(var i=1950;i<=2018;i++){
+				$("#year").append(new Option(i+"년",i),optionIndex++);   
+			}
+		}
+
+		function appendMonth(){
+			var optionIndex = 0;
+			for(var i=1;i<=12;i++){
+				if(i < 10){
+					$("#month").append(new Option(i+"월","0"+String(i)),optionIndex++);  
+				}else{
+					$("#month").append(new Option(i+"월",i),optionIndex++);  
+				}
+				 
+			}
+		}
+
+		function appendDay(){
+			var optionIndex = 0;
+			for(var i=1;i<=31;i++){
+				if(i < 10){
+					$("#day").append(new Option(i+"일","0"+String(i)),optionIndex++);   
+				}else{
+					$("#day").append(new Option(i+"일",String(i)),optionIndex++);   
+				}
+				
+			}
+		} 
+		
+	})
+	
+	</script>
+</th:block>
+</html>

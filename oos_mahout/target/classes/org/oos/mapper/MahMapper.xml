@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.oos.mapper.MahMapper">
+
+	<insert id="insert_user_order">
+		insert into user_recommend(mno, pno)
+		values(#{user_id}, #{item_id})
+	</insert>
+
+	<select id="getMemberList" resultType="org.oos.domain.MemberVO">
+		select * from
+		tbl_member_auth
+		where ano > 0
+		order by ano
+	</select>
+
+	<delete id="delete">
+		delete from user_recommend
+	</delete>
+
+</mapper>

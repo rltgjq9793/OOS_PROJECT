@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="org.oos.mapper.AdminNotifyMapper">
+
+  <select id="getList" parameterType="map" resultType="org.oos.domain.AdminNotifyVO">
+  select * from tbl_admin_notify
+  where bno > 0 and del = 'n'
+ 	<if test="dto.cri.category != null">
+ 		<if test="dto.cri.category == 'tc'.toString()">
+		and (title like concat("%", #{dto.cri.keyword} ,"%")
+		or content like concat("%", #{dto.cri.keyword} ,"%"))
+		</if>
+		<if test="dto.cri.category != 'tc'.toString()">
+			and ${dto.cri.category} like concat("%", #{dto.cri.keyword} ,"%")
+		</if>
+	</if>
+  order by bno desc
+  limit #{dto.cri.skip}, #{dto.cri.amount}
+  </select>
+  
+  <delete id="delete">
+  update tbl_admin_notify
+  set del='y'
+  where bno = #{bno}
+  </delete>
+  
+  <update id="modify">
+  update tbl_admin_notify
+  set content = #{content}, title = #{title}, updatedate=now()
+  where bno = #{bno}	
+  </update>
+  
+  <insert id="insert">
+  insert into tbl_admin_notify(title, content)
+		values(#{title},#{content})
+  </insert>
+  
+  <select id="get" resultType="org.oos.domain.AdminNotifyVO">
+  		select * from tbl_admin_notify
+		where bno = #{bno}
+  </select>
+
+  <select id="count" resultType="int">
+	 select count(*) from tbl_admin_notify
+	 where bno > 0 and del = 'n'
+  	<if test="category != null">
+ 		<if test="category == 'tc'.toString()">
+		and (title like concat("%", #{keyword} ,"%")
+		or content like concat("%", #{keyword} ,"%"))
+		</if>
+		<if test="category != 'tc'.toString()">
+			and ${category} like concat("%", #{keyword} ,"%")
+		</if>
+	</if>
+	</select>	
+  
+  </mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.oos.mapper.CartMapper">
+
+	<resultMap type="org.oos.domain.ProductOptionVO" id="Option">
+		<result column="opno" property="opno" />
+		<result column="size" property="size" />
+		<result column="qty" property="qty" />
+	</resultMap>
+	<resultMap type="org.oos.domain.ProductImgVO" id="Image">
+		<result column="uuid" property="uuid" />
+		<result column="iname" property="iname" />
+		<result column="ipath" property="ipath" />
+	</resultMap>
+	<resultMap type="org.oos.domain.ProductVO" id="Product">
+		<result column="pno" property="pno" />
+		<result column="pname" property="pname" />
+		<result column="price" property="price" />
+		<result column="sno" property="sno" />
+		<result column="regdate" property="regdate" />
+		<result column="updatedate" property="updatedate" />
+		<result column="del" property="del" />
+		<result column="questionreplycnt" property="questionReplyCnt" />
+		<result column="reviewreplycnt" property="reviewReplyCnt" />
+		<result column="content" property="content" />
+		<collection property="imgList" resultMap="Image" />
+	</resultMap>
+
+	<resultMap type="org.oos.domain.CartVO" id="Cart">
+		<result column="cno" property="cno" />
+		<result column="mid" property="mid" />
+		<result column="pno" property="pno" />
+		<result column="qty" property="qty" />
+		<result column="opno" property="opno" />
+		<result column="sno" property="sno" />
+		<collection property="product" resultMap="Product" />
+		<collection property="opt" resultMap="Option"/>
+	</resultMap>
+<!-- 	
+	<select id="getList" parameterType="map"
+		resultType="org.oos.domain.CartVO">
+		select * from tbl_cart
+		where cno > 0 and mid = #{mid}
+		order by cno desc
+		<if test="cri != null ">
+			limit #{cri.skip}, #{cri.amount}
+		</if>
+	</select> -->
+	
+	<select id="getListByMid" parameterType="map" resultMap="Cart">
+		select i.pno, a.cno, a.sno, a.mid, a.qty,a.price, a.opno, 
+		a.pname, a.size, i.uuid,i.ipath, i.iname from tbl_product_img i
+		join(select cno, mid, p.pno, c.qty, c.opno, p.price, p.pname, p.sno, o.size
+		from tbl_cart c left join tbl_product_option o on c.opno=o.opno
+		 				left join tbl_product p on c.pno=p.pno
+				where  c.cno > 0 and c.mid = #{mid}) a
+		on(a.pno = i.pno)
+		where uuid != ''
+		group by a.opno
+		order by cno desc
+		<if test="dto != null ">
+			limit #{dto.cri.skip}, #{dto.cri.amount}
+		</if>
+	</select>
+	
+	<select id="getByCno" resultMap="Cart">
+	select * from 
+		tbl_cart c left join tbl_product_option o on c.pno=o.pno
+ 		left join tbl_product p on c.pno=p.pno
+ 	where cno = #{cno}
+ </select>
+ 
+	<select id="getByOpno" resultType="org.oos.domain.CartVO">
+		select * from tbl_cart
+		where opno = #{opno}
+	</select>
+
+	<insert id="insert">
+		insert into tbl_cart(mid, pno, qty, opno, sno)
+		values(#{mid}, #{pno}, #{qty}, #{opno}, #{sno})
+	</insert>
+
+	<update id="update">
+		update tbl_cart
+		set qty = #{qty}
+		where cno = #{cno}
+	</update>
+
+	<delete id="delete">
+		delete from tbl_cart
+		where cno = #{cno}
+	</delete>
+
+	<select id="count" resultType="int">
+		select count(*) from tbl_cart
+		where cno > 0 and mid = #{mid}
+	</select>
+</mapper>

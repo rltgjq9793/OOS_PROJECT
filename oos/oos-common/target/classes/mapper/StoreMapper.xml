@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.oos.mapper.StoreMapper">
+	<resultMap type="org.oos.domain.StoreHashTagVO" id="HashTag">
+		<result column="shno" property="shno" />
+		<result column="hno" property="hno" />
+		<result column="tag" property="tag" />
+		<result column="del" property="del" />
+	</resultMap>
+
+	<resultMap type="org.oos.domain.StoreImgVO" id="Image">
+		<result column="uuid" property="uuid" />
+		<result column="iname" property="iname" />
+		<result column="ipath" property="ipath" />
+	</resultMap>
+
+	<resultMap type="org.oos.domain.StoreVO" id="Store">
+		<result column="sno" property="sno" />
+		<result column="sname" property="sname" />
+		<result column="owner" property="owner" />
+		<result column="regdate" property="regdate" />
+		<result column="updatedate" property="updatedate" />
+		<result column="del" property="del" />
+		<result column="saddress" property="saddress" />
+		<result column="saddressdetail" property="saddressdetail" />
+		<result column="tel" property="tel" />
+		<result column="likeNum" property="likeNum" />
+		<result column="pdNum" property="pdNum" />
+		<result column="odNum" property="odNum" />
+		<result column="visitcnt" property="visitcnt" />
+		
+		<collection property="imgList" resultMap="Image" />
+		<collection property="hashList" resultMap="HashTag" />
+	</resultMap>
+
+	<select id="getList2" resultMap="Store">
+		select * from
+		tbl_store s left join tbl_store_img i on s.sno =i.sno
+		left join tbl_store_hashtag h on s.sno=h.sno
+		where s.sno> 0 and s.del='N'
+		<if test="cri.filter != null">
+			and s.sname like concat("%", #{cri.keyword} ,"%")
+		</if>
+		group by s.sno desc
+		limit #{cri.skip}, #{cri.amount}
+	</select>
+
+	<!-- <select id="getList" resultType="org.oos.domain.StoreVO"> select * 
+		from tbl_store where sno > 0 and del='N' <if test="cri.category != null"> 
+		and sname like concat("%", #{cri.keyword} ,"%") </if> order by sno desc limit 
+		#{cri.skip}, #{cri.amount} </select> -->
+
+	<select id="getStoreList" resultMap="Store">
+		select a.sno, a.sname, a.saddress, a.tel, pdNum, likeNum, d.uuid,
+		d.ipath, d.iname
+		from tbl_store a
+		left join (select sno, count(*) pdNum
+		from tbl_product
+		where pno > 0 and del = 'N'
+		group by sno) b
+		on a.sno = b.sno
+		left join (select sno, count(*) likeNum from
+		tbl_store_like
+		where lno > 0
+		group by sno) c
+		on c.sno = a.sno
+		left join (select * from tbl_store_img) d
+		on d.sno = a.sno
+		where a.sno > 0
+		<if test="cri.filter != null">
+			and a.sname like concat("%", #{cri.keyword} ,"%")
+		</if>
+		<choose>
+			<when test="cri.orderby == '1'.toString()">
+				order by c.likeNum desc
+			</when>
+			<when test="cri.orderby == '2'.toString()">
+				order by pdNum desc
+			</when>
+			<otherwise>
+				order by a.sno desc
+			</otherwise>
+		</choose>
+		limit #{cri.skip}, #{cri.amount}
+	</select>
+
+	<select id="getBySno" resultMap="Store">
+		select * from tbl_store s 
+	left join tbl_store_img i
+	on s.sno =i.sno 
+    left join tbl_store_hashtag h 
+    on s.sno=h.sno
+    left join (select sno, count(*) pdNum
+		from tbl_product
+		where pno > 0 and del = 'N'
+		group by sno) b
+		on s.sno = b.sno
+        left join (select sno, count(*) likeNum from
+		tbl_store_like
+        where lno > 0
+		group by sno) c
+		on c.sno = s.sno
+		where s.sno= #{sno} and h.hno > 0 and uuid != "" and s.sno > 0
+        group by s.sno
+	</select>
+
+	<!-- <select id="get" resultType="org.oos.domain.StoreVO"> select * from 
+		tbl_store where sno = #{sno} </select> -->
+
+	<select id="getBestStore" resultMap="Store">
+		select s.sno, s.tel,
+		s.sname, uuid, iname, ipath, odNum from tbl_store s
+		left join
+		tbl_store_img i
+		on i.sno = s.sno
+		left join (select sno, count(*) odNum
+		from tbl_order_detail
+		where odno > 0 and del = 'N' group by sno) d
+		on s.sno = d.sno
+		where s.sno > 0
+		and s.del = 'N' and uuid !=""
+		group by sno
+		order by odNum desc
+		limit 0, 6
+	</select>
+
+	<select id="getBySid" resultMap="Store">
+		select * from tbl_store s left join tbl_store_img i
+		on s.sno =i.sno
+		left join tbl_store_hashtag h on s.sno=h.sno
+		where
+		s.owner = #{owner} and s.sno>0
+	</select>
+	
+	
+	<insert id="insert">
+		insert into tbl_store(sname,owner,saddress,saddressdetail,tel)
+		values(#{sname},#{owner},#{saddress},#{saddressdetail},#{tel})
+		<selectKey resultType="Long" keyProperty="sno" order="AFTER">
+			select
+			max(sno) from tbl_store
+		</selectKey>
+	</insert>
+
+	<update id="modify">
+		update tbl_store set sname = #{sname}, owner =
+		#{owner},
+		saddress = #{saddress}, tel = #{tel},saddressdetail = #{saddressdetail},
+		updatedate = now()
+		where sno = #{sno}
+	</update>
+
+	<update id="delete">
+		update tbl_store set del='Y' where sno = #{sno}
+	</update>
+	<update id="upVisitCnt">
+		update tbl_store set visitcnt=visitcnt+1 where sno =
+		#{sno}
+	</update>
+	
+	
+	<update id="resetVisitCnt">
+		update tbl_store set visitcnt=0 where sno >0
+	</update>
+	<select id="count" resultType="int">
+		select count(*) from tbl_store
+		where sno > 0 and del = 'N'
+		<if test="filter != null">
+			and sname like concat("%", #{keyword} ,"%")
+		</if>
+	</select>
+
+	<select id="getName" resultType="string">
+		select sname
+		from tbl_store
+		where
+		sno>0
+	</select>
+
+	<select id="pNumCount" resultType="int">
+		select count(*) from
+		tbl_product
+		where sno > 0 and del = 'N' and sno = #{sno}
+	</select>
+
+	<delete id="delStoreLike">
+		delete from tbl_store_like
+		where sno = #{sno} and
+		mid=#{mid}
+	</delete>
+
+	<insert id="inStoreLike">
+		insert into tbl_store_like(mid, sno)
+		value(#{mid},#{sno})
+	</insert>
+
+	<select id="getStoreLike" resultType="org.oos.domain.StoreVO">
+		select * from
+		tbl_store_like
+		where sno > 0 and mid = #{mid} and sno = #{sno}
+	</select>
+	
+	<select id="totalVisit" resultType="int">
+		select ifnull(sum(visitcnt),0) from tbl_store where sno >0
+	</select>
+</mapper>

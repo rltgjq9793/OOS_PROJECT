@@ -1,0 +1,382 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/sellerLayout}">
+
+
+<div class="container" style="margin-top: 20px;"
+	layout:fragment="container">
+
+<h2 align="center">판매자 회원 관리</h2>
+
+
+	<div class="row">
+       <div class="input-group custom-search-form" style="width:200px; float: right;">
+       
+       <select name="sfl" class="form-control" id="sellerSearchType">
+            <option value="id"}>이름</option>
+            <option value="sname">아이디</option>
+            <option value="bnum">사업자번호</option>
+            <option value="auth">권한</option>
+        </select>
+           <input type="text" class="form-control" id="sellerSearchInput" placeholder="Search...">
+           <span class="input-group-btn">
+	           <button class="btn btn-default" type="button" id="sellerSearch" style="height: 68px">
+	               <i class="fa fa-search"></i>
+      		</span>
+       </div>
+       
+		<div class="row">
+			<div class="col-sm-12" align="center">
+			
+						<table class="table table-striped table-bordered"
+				style="width: 20%; max-width:1100px; float:left";>
+				<tbody>
+					<tr>
+						<td><input type='checkbox' class="sortChk" id="chk"></td>
+						<td>ALL</td>
+						<td><input type='checkbox' class="sortChk" id="sellerChk"></td>
+						<td>SELLER</td>
+						<td><input type='checkbox' class="sortChk" id="noneChk"></td>
+						<td>UNAPPROVED SELLER</td>
+						<td><input type='checkbox' class="sortChk" id="banChk"></td>
+						<td>BAN</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			
+				<table width="100%"
+					class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
+					id="dataTables-example" role="grid"
+					aria-describedby="dataTables-example_info" style="width: 100%";>
+					<thead>
+						<tr role="row" style="text-align: center;">
+							<th class="sorting_asc" tabindex="0"
+								aria-controls="dataTables-example" rowspan="1" colspan="1"
+								aria-sort="ascending"
+								aria-label="Rendering engine: activate to sort column descending"
+								style="width: 50px;"></th>
+							<th class="sorting" tabindex="0"
+								aria-controls="dataTables-example" rowspan="1" colspan="1"
+								aria-label="Browser: activate to sort column ascending"
+								style="width: 120px;">판매자ID</th>
+							<th class="sorting" tabindex="0"
+								aria-controls="dataTables-example" rowspan="1" colspan="1"
+								aria-label="Platform(s): activate to sort column ascending"
+								style="width: 100px;">판매자이름</th>
+							<th class="sorting" tabindex="0"
+								aria-controls="dataTables-example" rowspan="1" colspan="1"
+								aria-label="CSS grade: activate to sort column ascending"
+								style="width: 110px;">판매자 사업자번호</th>
+							<th class="sorting" tabindex="0"
+								aria-controls="dataTables-example" rowspan="1" colspan="1"
+								aria-label="Platform(s): activate to sort column ascending"
+								style="width: 110px;">판매자연락처</th>	
+							<th class="sorting" tabindex="0"
+								aria-controls="dataTables-example" rowspan="1" colspan="1"
+								aria-label="CSS grade: activate to sort column ascending"
+								style="width: 100px;">최종접속</th>
+							<th class="sorting" tabindex="0"
+								aria-controls="dataTables-example" rowspan="1" colspan="1"
+								aria-label="CSS grade: activate to sort column ascending"
+								style="width: 80px;">권한</th>
+							<th class="sorting" tabindex="0"
+								aria-controls="dataTables-example" rowspan="1" colspan="1"
+								aria-label="CSS grade: activate to sort column ascending"
+								style="width: 100px;">인증 및 수정</th>
+
+						</tr>
+					</thead>
+					<tbody>
+
+						<tr class="gradeA odd" role="row" th:each=arr:${seller}>
+							<td class="sorting">
+							<input type="checkbox" class="chk" name="checkbox" th:id="|chk_${arr.sid}|"></td>
+							<td class="sid" th:text=${arr.sid}></td>
+							<td class="sname" th:text=${arr.sname}></td>
+							<td class="bnum" th:text=${arr.bnum}></td>
+							<td class="email" th:text=${arr.pnum}></td>
+							<td class="updatedate" th:text="${#dates.format(arr.updatedate,'yyyy-MM-dd')}"></td>
+							<td class="auth">
+							<select th:class="|select auth_${arr.authList[0].ano}|" th:id="|select_${arr.sid}|">
+									<option value="SELLER">승인 판매자</option>
+									<option value="NONE">미승인 판매자</option>
+									<option value="BAN">판매금지 판매자</option>
+							</select></td>
+	
+								
+							<td class="button">
+							<button type="button" class="btn btn-primary btn-circle"><i class="fa fa-pencil"></i></button>
+							<button type="button" class="btn btn-info btn-circle"><i class="fa fa-check"></i></button>
+							<button type="button" class="btn btn-warning btn-circle" id="remove-btn1"><i class="fa fa-times"></i></button>
+							</td>
+							
+<!-- 							<td class="price" th:text=${arr.product.price}></td>
+							
+							<td class="shipnumber"><input type="number" th:id="|ship_${arr.odno}|" th:value="${arr.dno}" /></td> -->
+
+				<!-- 	 <td class=""><button type="submit" data-oper='remove' class="btn-remove basketSwapBtn" 
+ 						style="width:80px; color:#fff; background: black;" th:data-ono="${arr.ono}">주문취소</button> -->
+					</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div id="dataTables-example_wrapper"
+				class="dataTables_wrapper form-inline dt-bootstrap no-footer"
+				style="align-item: left;">
+				<div class="col-sm-6">
+					<div align="left" id="dataTables-example_filter"
+						class="dataTables_filter">
+
+						<button type="submit" data-oper='modify' value="수정하기"
+							class="form-control input-sm" id="modify-btn"
+							aria-controls="dataTables-example">수정하기</button>
+
+						<!-- 			<button type="submit" data-oper='remove' class="btn-remove basketSwapBtn" 
+ 						style="width:80px; color:#fff; background: black;" th:data-ono="${arr.ono}">주문취소</button> -->
+
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="dataTables_info" id="dataTables-example_info"
+				role="status" aria-live="polite">Showing 1 to 10</div>
+		</div>
+
+		<div class="pull-right">
+
+			<ul class="pagination">
+				<li class="paginate_button previous"
+					th:if="${pageMaker.prev} == true"></li>
+				<li style="display: inline-block; vertical-align: top;"
+					th:each="page : ${pageList}">
+					<button class="paginate_button" th:id="|page_${page}|"
+						th:text="${page}">1</button>
+				</li>
+				<li class="paginate_button" th:if="${pageMaker.next} == true"></li>
+
+			</ul>
+		</div>
+
+	</div>
+
+	<form id="manageForm">
+		<input type='hidden' name='amount' th:value='${pageMaker.cri.amount}' />
+		<input type='hidden' id='pageNum' name='pageNum' th:value='${pageMaker.cri.pageNum}' /> 
+			
+	</form>
+</div>
+
+
+
+
+<div class="modal fade" id="modifyState" tabindex="-1" role="dialog"
+	aria-labelledby="modifyModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modifyModalLabel">배송중으로 상태를
+					변경하시겠습니까?</h5>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				'배송하기'버튼을 누르면 해당 주문건은 배송하기로 변경됩니다. 정말로 변경하시겠습니까?
+				<!--해당 글 삭제하는 주소값받는 input 태그-->
+			</div>
+			<div class="modal-footer">
+
+				<button type="button" class="btn btn-primary" id="modifyState"
+					onclick=location.replace="modifyURL">배송중으로 전환하기</button>
+
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script src="/js/jquery.min.js"></script>
+<th:block layout:fragment="script">
+	<script th:inline="javascript">
+
+$(document).ready(function(){
+	
+	var orderForm = $("#orderListForm");
+	var pageMaker = [[${pageMaker}]];
+	var manageForm = $("#manageForm");
+	var pageMaker = [[${pageMaker}]];
+	var product = [[${product}]];
+	var seller = [[${seller}]];
+	
+	
+		//자동체크박스체크
+		(function(){
+				
+			
+			//상단검색필터
+				var cat = pageMaker.cri.category;
+				if(cat == "SELLER"){
+					$("input[id=sellerChk]").attr("checked",true);
+				}else if(cat == "NONE"){
+					$("input[id=noneChk]").attr("checked",true);			
+				}else if(!cat){
+					$("input[id=chk]").attr("checked",true);
+				}
+				
+				
+				//상단검색필터를 위한 값변화
+				$(".sortChk").change(function(){
+					if($(this).attr("id") == "sellerChk"){
+						manageForm.append("<input type='hidden' name='category' value='SELLER'>");
+					}else if($(this).attr("id") == "noneChk"){
+						manageForm.append("<input type='hidden' name='category' value='NONE'>");
+					}else if($(this).attr("id") == "banChk"){
+						manageForm.append("<input type='hidden' name='category' value='BAN'>");
+					}
+					manageForm.submit();
+				});
+				
+				
+			//Select option 권한값 유지
+				$.each(seller, function(index, item){
+					var auth = item.authList[0];
+					console.log(auth);
+					$(".auth_"+auth.ano).val(auth.auth);
+				});
+			})();
+		
+		
+		
+		$(".select").change(function(){
+			$("#chk_"+$(this).attr("id").substring(7)).attr("checked",true);
+		});
+		
+		
+		//검색
+		$("#sellerSearch").click(function(){
+			var searchType = $("#sellerSearchType").attr("value");
+			var keyword = $("#sellerSearchInput").val();
+			
+	/* 		if(!sellerSearchType.find("optio:selected").val()){
+				alert("검색종류를 선택하세요.");
+				return false
+			} */
+			
+			if(!keyword){
+				alert("내용을 입력해주세요.");
+				return false;
+			}
+			/* manageForm.append("<input type='hidden' name='searchType' value='"+searchType+"'>") */
+			manageForm.append("<input type='hidden' name='keyword' value='"+keyword+"'>")
+			.submit();
+		});
+	
+		
+		//페이지
+		$(".paginate_button").click(function(e) {
+	        $("#pageNum").val(String($(this).attr("id")).substring(5));
+	        orderForm.submit();
+	    });
+	    
+	    $(".paginate_button previous").click(function(){
+	        $("#pageNum").val(Number(pageMaker.startPage) -1);
+	        orderForm.submit();
+	    });
+	    
+	    $(".paginate_button next").click(function(){
+	        $("#pageNum").val(Number(pageMaker.endPage) + 1);
+	        orderForm.submit();
+	    });
+	    
+	    
+	    //삭제
+		$('#remove-btn').click(function() {
+		
+			if (confirm("해당 판매자 정보를 삭제하시겠습니까?") == true){ 
+				manageForm.html("");
+				$("input[name='checkbox']:checked").each(function(index, item){
+					manageForm.append("<input type='hidden' name='sid' value='"+item.value+"' >")
+					
+				});
+				
+				manageForm.append("<input type='hidden' name='"+csrfName+"' value='"+token+"' >")
+							.attr("method", "post").attr("action","/admin/manageSeller").submit(); 
+			}else{ 
+			    return;
+			}
+		});
+	   
+	    
+		//수정버튼
+		$("#modify-btn").click(function(){
+			$("input[class=chk]:checked").each(function(){
+				var sid = $(this).attr("id").substring(4);
+				var auth = $("#select_"+sid).val();
+				console.log(auth);
+				manageForm.attr("method","post")
+							.attr("action","/admin/sellerModfiy")
+							.append("<input type='hidden' name='"+csrfName+"' value='"+token+"' >")
+							.append("<input type='hidden' name='options' value='"+sid+"_"+auth+"'>")
+			});
+			manageForm.submit();
+			alert("권한이 변경되었습니다.");
+		});
+		
+	//페이지
+	$(".paginate_button").click(function(e) {
+		
+		 $("#pageNum").val($(this).attr("id").substring(5));
+		 manageForm.submit();
+	});
+	
+	$(".paginate_button previous").click(function(){
+		$("#pageNum").val(Number(pageMaker.startPage) -1);
+		manageForm.submit();
+	});
+	
+	$(".paginate_button next").click(function(){
+		$("#pageNum").val(Number(pageMaker.endPage) + 1);
+		manageForm.submit();
+	});
+});
+
+	
+	
+
+/* 	    $('#modifyState').on('show.bs.modal', function(event){
+
+
+var button = $(event.relatedTarget);
+var modifyURL = button.data('title');
+var modal = $(this);
+var result = '<th:value = "${orderList.order.state}"/">';
+
+checkModal(result);
+
+function checkModal(result){
+	
+	if(result === ''){
+		return;
+	}
+	
+	if(parseInt(result) > 0){
+    	$(".modal-body").html("해당주문건"+ parseInt(result) + 배송주문으로 상태를 전환합니다.);
+
+	}
+	
+	$("#modifyState").modal("show");
+}
+
+})
+*/
+	</script>
+</th:block>
+</html>

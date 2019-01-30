@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.oos.mapper.OrderMapper">
+	<resultMap type="org.oos.domain.ProductVO" id="Product">
+		<result column="pno" property="pno" />
+		<result column="pname" property="pname" />
+	</resultMap>
+	
+	<resultMap type="org.oos.domain.OrderVO" id="Order">
+		<result column="ono" property="ono" />
+		<result column="dno" property="dno" />
+		<result column="total" property="total" />
+		<result column="sno" property="sno" />
+		<result column="mid" property="mid" />
+		<result column="state" property="state" />
+		<result column="regdate" property="regdate" />
+		<result column="del" property="del" />
+		<collection property="product" resultMap="Product" />
+	</resultMap>
+	
+	
+	<select id="getList" parameterType="map"
+		resultMap="Order">
+		select o.ono, p.pno, o.regdate, p.pname, o.total, o.state from tbl_order o
+		left join tbl_order_detail d
+		on o.ono = d.ono
+		left join tbl_product p
+		on p.pno = d.pno
+		where o.del = 'N' and o.ono > 0 and d.odno > 0
+		and o.mid = #{mid}
+		<if test="dto.cri.dayStart != null and dto.cri.dayEnd != null ">
+			and DATE(o.regdate) BETWEEN #{dto.cri.dayStart} AND #{dto.cri.dayEnd}
+		</if>
+		order by ono desc
+		limit #{dto.cri.skip}, #{dto.cri.amount}
+	</select>
+
+	<select id="count" resultType="int">
+		select count(*) from tbl_order
+		where ono > 0 and del='N'
+		<if test="mid != null">
+			and mid = #{mid} 
+		</if>
+		<if test="ono != null">
+			and ono = #{ono} 
+		</if>
+		<if test="cri.dayStart != null and cri.dayEnd != null ">
+			and DATE(regdate) BETWEEN #{dto.cri.dayStart} AND #{dto.cri.dayEnd}
+		</if>
+	</select>
+
+	<select id="get" resultType="org.oos.domain.OrderVO">
+		select * from tbl_order where ono =#{ono}
+	</select>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="ono">
+		insert
+		into tbl_order(mid, total) value(#{mid}, #{total})
+	</insert>
+
+
+	<update id="delete">
+		update tbl_order set del = "Y" where ono = #{ono}
+	</update>
+	
+	<update id="modify">
+		update tbl_order set state = #{state}, dno = #{dno} where ono = #{ono}
+	</update>
+
+	<select id="orderList" parameterType="map"
+		resultType="org.oos.domain.OrderVO">
+		select * from tbl_order
+		where ono > 0 and sno = #{sno} and
+		del='N'
+		<if test="dto.cri.dayStart != null and dto.cri.dayEnd != null ">
+		and DATE(regdate) BETWEEN #{dto.cri.dayStart} AND #{dto.cri.dayEnd}
+		</if>
+		order by ono desc, regdate desc
+		limit #{dto.cri.skip}, #{dto.cri.amount}
+	</select>
+
+	<!-- <select id="orderCount" parameterType="map" resultType="int">
+		select count(*) from tbl_order_detail
+		where ono > 0
+		and sno = #{sno} and del='N'
+		<if test="cri.dayStart != null and cri.dayEnd != null ">
+			and DATE(regdate) BETWEEN #{dto.cri.dayStart} AND #{dto.cri.dayEnd}
+		</if>
+		order by ono desc, regdate desc
+		limit #{dto.cri.skip}, #{dto.cri.amount}
+	</select> -->
+	
+	<select id="todayRevenue" resultType="int" parameterType="map">		
+		select ifnull(sum(total),0) from tbl_order
+		
+		where del='N' and ono>0
+	       
+        and date(regdate) = date(now())
+       
+	</select>
+	
+	<select id="monthlyRevenue" resultType="int">		
+		select  ifnull(sum(total),0) from tbl_order
+		 where del='N' and ono>0
+		 
+		 <![CDATA[ 
+			and ( date(regdate) > LAST_DAY(NOW() - interval 1 month) AND date(regdate) <= LAST_DAY(NOW())); 
+			]]>
+		
+	</select>
+	
+	
+</mapper>

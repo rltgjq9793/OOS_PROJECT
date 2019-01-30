@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.oos.mapper.ReplyMapper">
+
+	<resultMap type="org.oos.domain.StoreVO" id="Store">
+		<result column="sno" property="sno" />
+		<result column="sid" property="sid" />
+	</resultMap>
+	<resultMap type="org.oos.domain.ProductVO" id="Product">
+		<result column="pname" property="pname" />
+	</resultMap>
+	<resultMap type="org.oos.domain.ReplyVO" id="Reply">
+		<result column="rno" property="rno" />
+		<result column="pno" property="pno" />
+		<result column="mid" property="mid" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="state" property="state" />
+		<result column="regdate" property="regdate" />
+		<result column="updatedate" property="updatedate" />
+		<result column="kind" property="kind" />
+		<result column="parent" property="parent" />
+		<result column="depth" property="depth" />
+		<result column="score" property="score" />
+		<collection property="store" resultMap="Store" />
+		<collection property="product" resultMap="Product" />
+	</resultMap>
+	
+	<select id="getList" parameterType="map"
+		resultType="org.oos.domain.ReplyVO">
+		select * from tbl_reply
+		where rno > 0 and del='N' and kind = #{kind}
+		and pno = #{pno}
+		order by parent desc, rno asc
+		limit #{cri.skip}, #{cri.amount}
+	</select>
+
+		
+<!-- 	<select id="depthGetList" parameterType="map" resultType="org.oos.domain.ReplyVO">
+		select * from tbl_reply
+		where pno=#{pno} and del='N' and kind=#{kind} and rno>0 and mid = #{mid}
+		order by parent desc, depth asc
+	</select> -->
+	
+
+	<select id="sellerReply" parameterType="map" resultType="org.oos.domain.ReplyVO">
+		select * from tbl_reply
+		where pno=#{pno} and del='N' and kind=#{kind} and rno > 0 and parent = #{parent}
+		order by parent desc, depth asc
+	</select>
+	
+
+	<select id="countNewReply" resultType="Integer">
+	select count(*) from tbl_reply r
+		join (select pno, pname, sno, questionreplycnt, reviewreplycnt from tbl_product
+		where del = 'N' and pno > 0) p
+		on p.pno = r.pno
+		where rno > 0 and del = 'N'
+		and sno =#{sno} and kind=#{kind} and  depth=0 and state='N';
+	</select>
+
+	<select id="getStoreReply" parameterType="map"
+		resultMap="Reply">
+		select rno, p.pno, p.pname, p.sno, mid, content, title, regdate, kind, state,score, parent from tbl_reply r
+		join (select pno, pname, sno, questionreplycnt, reviewreplycnt from tbl_product
+		where del = 'N' and pno > 0) p
+		on p.pno = r.pno
+		where rno > 0 and del = 'N'
+		<if test="sno != null">
+			and sno = #{sno}
+		</if>
+		<if test="mid != null">
+			and mid = #{mid}
+		</if>
+		and kind=#{kind}
+		and depth = 0
+		order by rno desc
+		limit #{dto.cri.skip}, #{dto.cri.amount}
+	</select>
+
+	<insert id="insert">
+		insert into tbl_reply(pno, mid, sid, content, title,
+		kind)
+		<if test="sid != null">
+			values(#{pno},#{sid},#{content},#{title},#{kind})
+		</if>
+		<if test="mid != null">
+			values(#{pno},#{mid},#{content},#{title},#{kind})
+		</if>
+	</insert>
+
+	<select id="get" resultType="org.oos.domain.ReplyVO">
+		select * from tbl_reply
+		where rno = #{rno}
+	</select>
+
+	<update id="update">
+		update tbl_reply
+		set content = #{content}, title =
+		#{title}, score=#{score}, updatedate = now()
+		where rno = #{rno}
+	</update>
+
+	<update id="delete">
+		update tbl_reply
+		set del='Y'
+		where rno=#{rno}
+	</update>
+
+	<select id="myOrderCount" parameterType="map" resultType="int">
+		select count(*) from tbl_reply
+		where rno > 0 and mid = #{mid} and del='N' and kind = #{kind}
+	</select>
+
+	<select id="count" parameterType="map" resultType="int">
+		select count(*) from tbl_reply r
+		join (select pno, pname, sno, questionreplycnt, reviewreplycnt from tbl_product
+		where del = 'N' and pno > 0) p
+		on p.pno = r.pno
+		where rno > 0 and del = 'N'
+		and sno = #{sno} and kind=#{kind}
+	</select>
+
+	<select id="parentCount" parameterType="map"
+		resultType="Integer">
+		select ifnull(max(parent),0)
+		from tbl_reply
+		where
+		rno>0 and pno=#{pno} and del='N' and kind=#{kind}
+	</select>
+
+	<insert id="depthInsert">
+		insert into
+		tbl_reply(pno,mid,sid,content,title,kind,parent,depth,score)
+		values(#{pno},#{mid},#{sid},#{content},#{title},#{kind},#{parent},#{depth},#{score})
+	</insert>
+
+	<select id="scoreAverage" parameterType="map"
+		resultType="double">
+		select ifnull(avg(score),0)
+		from tbl_reply
+		where pno = #{pno}
+		and kind='R' and del='N'
+	</select>
+	
+	<update id="getRemove">
+		update tbl_reply
+		set del='Y'
+		where rno=#{rno}
+	</update>
+	
+	<update id="stateUpdate">
+		update tbl_reply set state='Y'
+		where parent=#{parent}
+	</update>
+	
+	<insert id="sellerInsert">
+		insert into tbl_reply(pno, sid, content, title, parent, kind, depth)
+		values(#{pno},#{sid},#{content},#{title},#{parent},#{kind}, #{depth})		
+	</insert>
+
+</mapper>

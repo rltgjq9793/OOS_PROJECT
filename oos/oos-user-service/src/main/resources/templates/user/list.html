@@ -1,0 +1,228 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/shopLayout}">
+
+<div layout:fragment="container">
+
+		<div th:if="${product !=null}">
+			<div style="position: relative; width: 100%;">
+				<div class="sortMethodSelect"
+					style="margin-top: 40px; font-size: 13px; margin-right: 386px;">
+					<div id="sortMethod_0" class="sortMethodClass selected">최신순</div>
+					<div class="breakPoint">∙</div>
+					<div id="sortMethod_1" class="sortMethodClass">높은가격순</div>
+					<div class="breakPoint">∙</div>
+					<div id="sortMethod_2" class="sortMethodClass">낮은가격순</div>
+				</div>
+			</div>
+			<div class="div_line_grey_2px"
+				style="margin-top: 16px; margin-bottom: 16px;"></div>
+			<div style="width: 1100px; margin: 0 auto; position: relative;">
+				<ul id="goodsList"
+					style="list-style: outside none none; padding: 0px; position: relative; overflow: hidden;">
+					<ul class="goods_ul" th:each="arr :${product}">
+						<li th:class="|goodsContainer store_${arr.sno}|"
+							style="margin-right: 5px;" th:id="|link_${arr.pno}|">
+							<div class="goodsImg"
+								style="position: relative; width: 270px; height: 353px;">
+								<img th:id="|img_${arr.pno}|" class="productImg"
+									style="width: 100%; position: absolute; overflow: hidden; top: 0; bottom: 50px; margin: auto;">
+							</div>
+							<div class="goodsInfo" style="position: relative;">
+								<div class="goodsName" th:text="${arr.pname}" style="">PNAME</div>
+								<div class="storeLocation"
+									style="font-size: 13px; color: #9b9b9b; margin-top: 4px;"
+									th:text="${arr.sname}">SNAME</div>
+							</div>
+							<div style="margin: 0 15px;">
+								<span
+									style="float: right; font-size: 20px; font-weight: bold; margin-top: 7px;"
+									th:text="${arr.price}">PRICE</span>
+							</div> <span class="mouseOverBorder"></span>
+						</li>
+					</ul>
+				</ul>
+			</div>
+			<div class="notListMsg"></div>
+
+		</div>
+		<div th:if="${store !=null}">
+			<div style="position: relative; width: 100%;">
+				<div class="sortMethodSelect"
+					style="margin-top: 40px; font-size: 13px; margin-right: 386px;">
+					<div id="sortMethod_0" class="sortMethodClass store selected">최신순</div>
+					<div class="breakPoint">∙</div>
+					<div id="sortMethod_1" class="sortMethodClass store">스토어찜순</div>
+					<div class="breakPoint">∙</div>
+					<div id="sortMethod_2" class="sortMethodClass store">상품수량순</div>
+				</div>
+			</div>
+			<div class="div_line_grey_2px"
+				style="margin-top: 16px; margin-bottom: 16px;"></div>
+			<div style="width: 1100px; margin: 0 auto; position: relative;">
+				<ul id="goodsList"
+					style="list-style: outside none none; padding: 0px; position: relative; overflow: hidden;">
+
+					<table class="myPageSheetTable" cellspacing="0"
+						style="width: 100%;">
+						<colgroup>
+							<col width="80">
+							<col width="140">
+							<col width="80">
+							<col width="200">
+							<col width="40">
+							<col width="40">
+						</colgroup>
+						<thead>
+							<tr style="background-color: #fff;">
+								<th class="">이미지</th>
+								<th class="">상호</th>
+								<th class="">주소</th>
+								<th class="">연락처</th>
+								<th class="">스토어찜수</th>
+								<th class="">상품수</th>
+							</tr>
+						</thead>
+						<tbody id="storeSearchList_tbody">
+							<tr class="height90" th:each="arr : ${store}">
+
+								<td class="borderBottom">
+									<div class="store_thumb">
+										<img class="goods_li_img" th:id="|thb_${arr.sno}|"
+											style="height: 80px;cursor: pointer">
+									</div>
+								</td>
+								<td class="borderBottom" style="padding: 1px 10px;">
+									<a class="linkClass" th:id="|sno_${arr.sno}|"
+										style="color: #333; cursor: pointer">
+										<strong th:text="${arr.sname}">SNAME</strong>
+									</a>
+								</td>
+								<td class="borderBottom" style="padding: 1px 10px;"
+									th:text="${arr.saddress}"></td>
+								<td class="borderBottom"
+									style="padding: 1px 10px;" th:text="${arr.tel}"></td>
+								<td class="borderBottom" style="color: #43a047; padding: 1px 10px;"
+									th:text="${arr.likeNum}"></td>
+								<td class="borderBottom"
+									style="color: #ffa000; padding: 1px 10px;"
+									th:text="${arr.pdNum}"></td>
+							</tr>
+						</tbody>
+					</table>
+				</ul>
+			</div>
+			<div class="notListMsg"></div>
+
+		</div>
+
+		<div style="text-align: center;"  th:if="${#lists.size(pageList) gt 1}">
+			<div class="pageControlLeft" th:if="${pageMaker.prev} == true"></div>
+			<div class="showPage"
+				style="display: inline-block; vertical-align: top;"
+				th:each="page : ${pageList}">
+				<button class="pageNum pageNumber" th:id="|page_${page}|"
+					th:text="${page}">1</button>
+			</div>
+			<div class="pageControlRight" th:if="${pageMaker.next} == true"></div>
+		</div>
+
+
+		<form id="listForm">
+			<input type='hidden' name='pageNum' id='pageNum'
+				th:value="${cri.pageNum}" /> 
+			<input type='hidden' name='category' id='category'
+				th:value="${cri.category}" /> 
+			<input type='hidden' name='keyword'
+				id='keyword' th:value="${cri.keyword}" />
+			<input type='hidden' name='orderby'
+				id='orderby' th:value="${cri.orderby}" />	
+		</form>
+</div>
+<th:block layout:fragment="script">
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			var listForm = $("#listForm");
+			var cri = [[${cri}]];
+			var product = [[${product}]];
+			var pageMaker = [[${pageMaker}]];
+			var store = [[${store}]];
+			
+			
+			(function() {
+				
+				if(product){
+					$.each(product, function(index, item){
+						var img = item.imgList[0];
+						var fileCallPath =  encodeURIComponent(img.ipath+"/"+img.uuid +"_"+img.iname);
+						$("#img_"+item.pno).attr("src","/display?fileName="+fileCallPath);
+					}); 
+				};
+				
+			 	if(store){
+					$.each(store, function(index, item){
+						var img = item.imgList[0];
+						
+						var fileCallPath =  encodeURIComponent(img.ipath+"/s_"+img.uuid +"_"+img.iname);
+						$("#thb_"+item.sno).attr("src","/display?fileName="+fileCallPath);
+						
+						
+					});
+				};
+				
+				
+				$("#pageNum").val(pageMaker.cri.pageNum);
+				$("#page_"+pageMaker.cri.pageNum).attr("style","color:#ff7f7a;");
+			})();
+			
+
+			$(".pageControlLeft").click(function(){
+				$("#pageNum").val(Number(pageMaker.startPage) -1);
+				listForm.submit();
+			});
+			
+			$(".pageControlRight").click(function(){
+				$("#pageNum").val(Number(pageMaker.endPage) + 1);
+				listForm.submit();
+			});
+			
+			$(".goodsContainer").click(function(e){
+				var pno = $(this).attr("id").substring(5);
+				var sno = $(this).attr("class").substring(21);
+				listForm.html("");
+				listForm.append("<input type='hidden' name='pno' value='"+pno+"'>");
+				if(cri.keyword == null){$("#keyword").remove();}
+				if(cri.category == null){$("#category").remove();}
+				
+				listForm.attr("action","/store/detail").submit();
+			});
+			
+			$(".sortMethodClass").click(function(e) {
+                var val = $(this).attr("id").substring(11);
+                $("#orderby").val(val);
+                listForm.attr("action", "/user/list");
+                
+                if($(this).hasClass("store")){
+                    listForm.append("<input type='hidden' name='filter' value='select2'>");
+                }
+                listForm.submit();
+            });
+			
+			$(".pageNum").click(function(e) {
+				listForm.append("<input type='hidden' name='pageNum' id='pageNum'>");
+				$("#pageNum").val($(this).attr("id").substring(5));
+				listForm.submit();
+			});
+			
+			$(".linkClass ,.goods_li_img").click(function(e){
+				e.preventDefault();
+				listForm.html("");
+				listForm.attr("action","/store/list")
+						.append("<input type='hidden' name='sno' value='"+
+									$(this).attr("id").substring(4)+"'>").submit();
+			});
+			
+		});
+	</script>
+</th:block>
+</html>

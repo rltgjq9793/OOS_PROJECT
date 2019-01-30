@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.oos.mapper.MahoutMapper">
+
+	<resultMap type="org.oos.domain.CartVO" id="Cart">
+		<result column="c_mid" property="mid" />
+		<result column="c_pno" property="pno"/>
+	</resultMap>
+	<resultMap type="org.oos.domain.OrderDetailVO" id="Order">
+		<result column="d_mid" property="mid" />
+		<result column="d_pno" property="pno"/>
+	</resultMap>
+	<resultMap type="org.oos.domain.Mahout_MemberVO" id="User">
+		<result column="mid" property="mid" />
+		<result column="ano" property="mno" />
+		<collection property="cartList" resultMap="Cart" />
+		<collection property="orderList" resultMap="Order" />
+	</resultMap>
+	<resultMap type="org.oos.domain.ProductImgVO" id="Image">
+		<result column="uuid" property="uuid" />
+		<result column="pno" property="pno" />
+		<result column="iname" property="iname" />
+		<result column="ipath" property="ipath" />
+	</resultMap>
+	<resultMap type="org.oos.domain.ProductVO" id="Product">
+		<result column="mid" property="mid" />
+		<result column="pno" property="pno" />
+		<result column="pname" property="pname" />
+		<result column="price" property="price" />
+		<collection property="imgList" resultMap="Image" />
+	</resultMap>
+	
+	<select id="getOrderList" resultMap="User">
+		select a.mid, a.ano, c.pno c_pno,c.mid c_mid, dt.pno d_pno, dt.mid d_mid 
+		from tbl_member_auth a
+        left join 
+			(select mid, pno from tbl_order_detail d 
+			left join tbl_order o
+			on d.ono = o.ono
+			where d.odno > 0 and o.ono > 0 and d.del = 'N'
+            group by mid, pno) dt
+        on a.mid = dt.mid
+        left join (select * from tbl_cart
+        	where cno > 0
+        group by mid, pno) c
+        on c.mid = a.mid
+		where a.ano > 0
+		order by ano, dt.pno
+	</select>
+	
+	<select id="getScoreList" resultType="org.oos.domain.ReplyVO">
+		select * from tbl_reply
+		where rno > 0 and kind = "R" and mid = #{mid} and del = 'N'
+		order by mid
+	</select>
+	
+	<select id="getRecList" resultMap="Product">
+		select * from user_recommend r
+		left join tbl_member_auth m
+		on m.ano = r.mno
+		left join tbl_product p
+		on p.pno = r.pno
+		left join tbl_product_img i
+		on i.pno = p.pno
+		where m.ano > 0 and p.pno > 0 and uuid != "" and mid = #{mid}
+		and p.del = 'N'
+	</select>
+	
+  <insert id="insert">
+  	insert into recommend(user_id, item_id, value)
+  	values(#{user_id}, #{item_id}, #{value})
+  </insert>
+
+
+  <delete id="delete">
+  	delete from recommend
+  </delete>
+  
+</mapper>

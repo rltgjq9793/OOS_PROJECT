@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.oos.mapper.MemberMapper">
+	<resultMap type="org.oos.domain.ProductImgVO" id="Image">
+		<result column="uuid" property="uuid" />
+		<result column="pno" property="pno"/>
+		<result column="iname" property="iname" />
+		<result column="ipath" property="ipath" />
+	</resultMap>
+	
+	<resultMap type="org.oos.domain.StoreVO" id="Store">
+		<result column="sno" property="sno" />
+		<result column="sname" property="sname" />
+		<result column="mid" property="mid" />
+		<result column="saddress" property="saddress" />
+		<result column="tel" property="tel" />
+		<collection property="imgList" resultMap="Image" />
+	</resultMap>
+	
+	<resultMap type="org.oos.domain.MemberAuth" id="Auth">
+		<result column="ano" property="ano" />
+		<result column="auth" property="auth" />
+	</resultMap>
+	
+	<resultMap type="org.oos.domain.MemberVO" id="Member">
+		<result column="mid" property="mid" />
+		<result column="mname" property="mname" />
+		<result column="mpw" property="mpw" />
+		<result column="pnum" property="pnum" />
+		<result column="birth" property="birth" />
+		<result column="email" property="email" />
+		<result column="address" property="address" />
+		<result column="addressdetail" property="addressdetail" />
+		<result column="sns" property="sns" />
+		<result column="regdate" property="regdate" />
+		<result column="permit" property="permit" />
+		<result column="del" property="del" />
+		<collection property="authList" resultMap="Auth" />
+	</resultMap>
+	
+	<select id="getUserList" resultMap="Member">
+		select *  from tbl_member m
+		left join tbl_member_auth a
+		on m.mid = a.mid
+		where m.mid != "" and del = 'N'
+		<if test="dto != null">
+			<if test="dto.cri.keyword != null">
+				and m.mid like concat("%", #{dto.cri.keyword} ,"%")
+			</if>
+			<if test="dto.cri.category != null">
+				and auth = #{dto.cri.category}
+			</if>
+			order by regdate desc
+			limit #{dto.cri.skip}, #{dto.cri.amount}
+		</if>
+	</select>
+
+	<select id="getUserCount" resultType="int">
+		select count(*)  from tbl_member m
+		left join tbl_member_auth a
+		on m.mid = a.mid
+		where m.mid != "" and del = 'N'
+		<if test="keyword != null">
+			and m.mid like concat("%", #{keyword} ,"%")
+		</if>
+	</select>
+
+	<select id="get" resultType="org.oos.domain.MemberVO">
+		select * from tbl_member
+		where mid=#{mid}
+	</select>
+	
+	<insert id="insert">
+		insert into tbl_member(mid,mpw,mname,pnum,birth,email,address,addressdetail,mno) 
+		values(#{mid},#{mpw},#{mname},#{pnum},#{birth},#{email},#{address},#{addressdetail},get_seq('member_seq'))
+	</insert>
+
+	<update id="modify">
+		update tbl_member 
+		set pnum = #{pnum}, email = #{email}, address = #{address}, addressdetail = #{addressdetail}
+		where mid = #{mid}
+	</update>
+	
+	<update id="modifyPw">
+		update tbl_member 
+		set mpw = #{mpw}
+		where mid = #{mid}
+	</update>
+
+	<update id="delete">
+		update tbl_member
+		set del = 'Y'
+		where mid = #{mid} 
+	</update>
+
+<!-- 	<update id="changePermit">
+		update tbl_member set permit = #{permit}
+		where mid =#{mid}
+	</update> -->
+	
+	<update id="changeAutority" parameterType="map">
+		update tbl_member_auth 
+		set auth = #{auth}
+		where mid =#{mid}
+	</update>
+	
+	<select id="count" resultType="int">
+	select count(*) from
+    tbl_member
+	where mid != '' and del = 'N'
+	</select>
+	
+	<select id="getMyStoreList" resultMap="Store">
+		select mid, l.sno, sname, saddress, tel, uuid, ipath, iname from tbl_store_like l
+		right join tbl_store s
+		on l.sno = s.sno
+		left join tbl_store_img i
+		on i.sno = s.sno
+		where l.lno > 0 and  del = 'N' and mid = #{mid}
+		limit #{cri.skip}, #{cri.amount}
+	</select>
+		
+	<select id="getMyStoreCount" resultType="int">
+		select count(*) from tbl_store_like
+		where lno > 0 and mid = #{mid}
+	</select>
+	
+	<insert id="insertSnsAuth">
+		insert into tbl_sns_auth(user_id, access_token, sns, user_pw)
+		value(#{user_id},#{access_token},#{sns},#{user_pw})
+	</insert>
+	
+	<select id="getSnsAuth" resultType="org.oos.domain.AuthDTO">
+		select * from tbl_sns_auth
+		where user_id=#{user_id} and del = 'N'
+	</select>
+
+	<update id="deleteSns">
+		update tbl_sns_auth
+		set del = 'Y'
+		where user_id = #{mid}
+	</update>
+	
+<!-- 	<select id="manageMember" parameterType="map" resultType="Member">
+		select m.mid, m.mname, m.updatedate, m.permit, m.del, a.auth  
+		from tbl_member m
+		left join tbl_member_auth a
+		on m.mid = a.mid
+		where m.del = 'N'
+	</select> -->
+	
+	<select id="newCustomer" resultType="int">
+		select count(*) from tbl_member where date(regdate)=curdate() and del='N'
+	</select>
+			
+	<select id="banCustomer" resultType="int">
+		select count(*) from tbl_member_auth where auth='ban' and ano >0
+	</select>
+
+</mapper>

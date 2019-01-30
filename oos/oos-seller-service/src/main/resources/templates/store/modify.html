@@ -1,0 +1,330 @@
+
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/sellerLayout}">
+
+
+
+<div class="container" style="margin-top: 20px;"
+	layout:fragment="container">
+	<style>
+form {
+	width: 100%;
+}
+
+.uploadResult {
+	width: 100%;
+	background-color: gray;
+}
+
+.uploadResult ul {
+	display: flex;
+	flex-flow: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.uploadResult ul li {
+	list-style: none;
+	padding: 10px;
+	align-content: center;
+	text-align: center;
+}
+
+.uploadResult ul li img {
+	width: 100px;
+	heigh: 100px;
+}
+
+.uploadResult ul li span {
+	color: white;
+}
+
+.bigPictureWrapper {
+	position: absolute;
+	display: none;
+	justify-content: center;
+	align-items: center;
+	top: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: gray;
+	z-index: 100;
+	background: rgba(255, 255, 255, 0.5);
+}
+
+.bigPicture {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.bigPicture img {
+	width: 600px;
+}
+</style>
+	<div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">스토어 정보 수정</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="panel panel-default">
+				<div class="panel-heading"></div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-12 col-sm-12">
+							<form role="form" action="/store/modify" method="post">
+								<div class="form-group">
+									<label>스토어명</label> 
+									<input id="sname" name="sname" type="text" class="form-control" th:value="${store.sname}">
+									<span id="failStore"></span>
+								</div>
+								<div class="form-group">
+									<label>판매자</label> 
+									<input id="owner" name="owner" type="text" class="form-control" th:value="${store.owner}" readonly="readonly">
+								</div>
+								<div class="form-group">
+									<label>전화 번호</label> 
+									<input id="tel" name="tel" type="text" class="form-control" th:value="${store.tel}">
+									<span id="failTel"></span>
+								</div>
+								<div class="form-group">
+									<input style="width: 80px;" class="orderInfo addressInfo"
+										id="roadAddr1" type="text" readonly="readonly">
+									<button class="adressSearch"
+										style="background: #ff7f7a; color: #fff;">주소검색</button>
+									<br> 
+									<input class="orderInfo addressInfo" type="text" 
+											name="saddress" th:value="${store.saddress}" id="roadAddr2">
+									<span id="failADDRESS"></span> <br> 
+									<input type="text" class="orderInfo addressInfo" maxlength="15"
+										name="saddressdetail" placeholder="상세 주소를 입력해주세요"
+										th:value="${store.saddressdetail}" id="roadAddr3"> 
+									<span id="failDETAIL"></span>
+								</div>
+								<div class="form-group uploadDiv">
+									<label>사진첨부(처음올리는 사진이 대표사진입니다.) </label> 
+									<input name="uploadFile" id="files" type="file" multiple>
+								</div>
+								<div class="uploadResult">
+									<ul>
+									</ul>
+								</div>
+
+								<div class="form-group">
+									<label>해시태그 선택</label><br>
+									<label>해시태그는 5개까지 등록가능합니다</label>
+									<div class="checkbox">
+										<label th:each="arr:${hashTagList}"> 
+											<input type="checkbox" class="hashTags" name="hashTag" th:data-tag="${arr.tag}" 
+											th:value="${arr.hno}" style="float: left;">[[${arr.tag}]]
+										</label>
+									</div>
+								</div>
+								<input type="hidden" name="sno" th:value="${store.sno}">
+								<button class="btn btn-success" type="submit">modify</button>
+								<input type='hidden' th:name="${_csrf.parameterName}"
+									th:value="${_csrf.token}" />
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="../js/jquery.min.js"></script>
+<th:block layout:fragment="script">
+	<script th:inline="javascript"
+		src="http://dmaps.daum.net/map_js_init/postcode.v2.js?autoload=false"></script>
+	<script th:inline="javascript">
+$(document).ready(function(e){
+
+	
+	var formObj = $("form[role='form']");
+	var hashTags=$(".hashTags");
+	var storeTags=[[${store.hashList}]];
+	//이미지 리스트 출력
+	(function(){
+		$(storeTags).each(function(i,stag){
+			var hashTag=$.find("input[value='"+stag.hno+"']");
+			hashTag[0].setAttribute("checked","checked");
+			
+		})
+	})();
+	
+    $(".adressSearch").click(function(e){
+		e.preventDefault();
+		daum.postcode.load(function(){
+	        new daum.Postcode({
+	            oncomplete: function(data) {
+	            	address(data);
+	            }
+	        }).open();
+	    });
+	});
+	     
+	   function address(data){
+		$("#roadAddr1").val(data.postcode);
+		$("#roadAddr2").val(data.roadAddress);
+		$("#roadAddr3").val("");
+	}
+	   
+	(function() {
+	
+		var arr=[[${store.imgList}]]
+
+			var str="";
+			$(arr).each(function(i, obj){
+				var fileCallPath =  encodeURIComponent( obj.ipath+ "/s_"+obj.uuid +"_"+obj.iname);
+				str += "<li data-path='"+obj.ipath+"' data-uuid='"+obj.uuid+"' data-filename='"+obj.iname+"'><div>";
+				str += "<span> "+ obj.iname+"</span>";
+				str += "<button type='button' data-file=\'"+fileCallPath+"\' class='quick_close_btn_20.png'>x</button><br>";
+				str += "<img src='/display?fileName="+fileCallPath+"'>";
+				str += "</div>";
+				str +"</li>";
+	
+			$(".uploadResult ul").html(str);
+		});
+	})();
+	
+	
+ 	//수정버튼 클릭
+	$("button[type='submit']").on("click",function(e){
+		
+		e.preventDefault();
+		var str="";
+		
+		signupCheck("sname", "스토어명","failStore");
+		signupCheck("tel", "전화번호","failTel");
+		signupCheck("roadAddr2", "주소", "failADDRESS");
+		signupCheck("roadAddr3", "상세주소", "failDETAIL");
+		
+		 $('input:checkbox[type=checkbox]:checked').each(function (i,e) {
+			
+			str +="<input type='hidden' id='hno' name='hashList["+i+"].hno' value='"+$(this).val()+"'>";
+			str +="<input type='hidden' name='hashList["+i+"].tag' value='"+$(this).data("tag")+"'>";
+			
+			if(i > 4){
+				alert("해시태그는 5개까지 등록가능합니다.");
+				str = "";
+				throw stop;
+			}
+		});
+		 
+		$(".uploadResult ul li").each(function(i,obj){		
+			var jobj= $(obj);
+			console.dir(jobj);
+			
+			str +="<input type='hidden' name='imgList["+i+"].iname' value='"+jobj.data("filename")+"'>";
+			str +="<input type='hidden' name='imgList["+i+"].uuid' value='"+jobj.data("uuid")+"'>";
+			str +="<input type='hidden' name='imgList["+i+"].ipath' value='"+jobj.data("path")+"'>";
+
+		});
+		
+		 
+		if($(".uploadResult ul").html() == ""){
+			alert("상점 이미지는 반드시 등록해야합니다.");
+			return;
+		};
+		
+		if($('input:checkbox[type=checkbox]:checked').length == 0){
+			alert("해시태그는 반드시 한 개 이상 등록해야합니다.");
+			return;
+		};
+		 
+		formObj.append(str).submit();
+	
+	});
+	var regex=new RegExp("(.*?)\.(exe|sh|zip|alz)$");
+	var maxSize=5242880;
+	function checkExtension(fileName,fileSize){
+		if(fileSize>=maxSize){
+			alert("파일 사이즈 초과");
+			return false;
+		}
+		if(regex.test(fileName)){
+			alert('해당 파일 업로드 불가');
+			return false;
+		}
+		return true;
+	}
+	
+	//파일 업로드
+	$("#files").change(function(e){
+		var formData=new FormData();
+
+		var inputFile = $("input[name='uploadFile']");
+		
+		var files = inputFile[0].files;
+		
+		for(var i=0;i<files.length;i++){
+			if(!checkExtension(files[i].name,files[i].size)){
+				return false;
+			}
+			formData.append("uploadFile",files[i]);
+		}
+			
+		$.ajax({
+			url:'/uploadStore',
+			processData:false,
+			contentType:false,
+			data:formData,
+			type:'POST',
+			dataType:'json',
+			success:function(result){
+				showUploadResult(result);
+			}
+		});
+	});
+	
+	//업로드한 파일 출력
+	function showUploadResult(uploadResultArr) {
+		if(!uploadResultArr||uploadResultArr.length==0){
+			return;
+		}
+		var uploadUL=$(".uploadResult ul");
+		var str="";
+		$(uploadResultArr).each(function(i,obj){
+				var fileCallPath =  encodeURIComponent( obj.ipath+ "/s_"+obj.uuid +"_"+obj.iname);
+				str += "<li data-path='"+obj.ipath+"' data-uuid='"+obj.uuid+"' data-filename='"+obj.iname+"'><div>";
+				str += "<span> "+ obj.iname+"</span>";
+				str += "<button type='button' data-file=\'"+fileCallPath+"\' class='quick_close_btn_20.png'>x</button><br>";
+				str += "<img src='/display?fileName="+fileCallPath+"'>";
+				str += "</div>";
+				str +"</li>";
+		});
+		uploadUL.append(str);
+	}
+	
+	//이미지삭제
+	$(".uploadResult").on("click","button",function(e){
+		
+		var targetFile = $(this).data("file");
+		var targetLi = $(this).closest("li");
+		
+		$.ajax({
+			url:'/deleteFile',
+			data:{fileName:targetFile},
+			dataType:'text',
+			type:'POST',
+			success:function(result){
+				alert(result);
+			targetLi.remove();	
+			}
+		});
+	});//end
+	
+	function signupCheck(id, string, fail){
+		if($("#"+id).val().length == 0){
+			$("#"+fail).html(string+"를(을) 입력해주세요");
+			throw "stop";
+		}
+	}
+
+});
+</script>
+</th:block>

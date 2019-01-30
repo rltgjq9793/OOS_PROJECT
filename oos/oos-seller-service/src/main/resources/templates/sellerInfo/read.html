@@ -1,0 +1,85 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/sellerLayout}">
+
+<div class="container" style="margin-top: 20px;"
+	layout:fragment="container">
+
+
+	<div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">판매자 정보 조회</h1>
+		</div>
+	</div>
+						<div class="col-lg-6">
+                                    <form role="form">
+                                        <div class="form-group">
+                                            <label>Seller Name</label>
+                                            <input class="form-control" th:value=${sellerInfo.sname} readonly>
+                                            <p class="help-block">최고관리자 요청에 의해 수정될 수 있습니다.</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Seller Id</label>
+                                            <input class="form-control" placeholder="Enter text" th:value=${sellerInfo.sid} readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Tel</label>
+                                            <input class="form-control" placeholder="수정할 내용을 작성해주세요." th:value=${sellerInfo.pnum} readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Seller Password</label>
+                                            <input type="password" class="form-control" th:value=${sellerInfo.spw} readonly></input>
+                                            <label>Seller Re Password</label>
+                                            <input type="password" class="form-control" th:value=${sellerInfo.spw} readonly></input>
+                                        </div>
+									
+                                       
+                                        <div class="form-group">
+                                            <label>Business Number</label>
+                                            <input class="form-control" placeholder="변경할 사업번호를 기재해주세요." th:value=${sellerInfo.bnum} readonly>
+                                        </div>
+                                        
+                                       <div class="form-group">
+                                            <label>Seller State</label>
+		                                         <select class="state" th:id="|state_${sellerInfo.sid}|" th:value=${sellerInfo.authList[0].auth}
+		                                         style="width:200px;height:40px;">
+												<option id="ready" value="seller"} readonly>판매자</option>
+												<option id="shipping" value="none" readonly>비판매자</option>
+												</select>
+                                        </div>
+                                        
+                                 		<div class="form-group">
+                                            <label>사업자 재인증요청</label>
+                                            <input type="file">
+                                        </div>
+
+									<div class="form-group">
+										<button type="modify" class="btn btn-warning">Modify Button</a></button>
+                                        <button type="submit" class="btn btn-info">Submit Button</button>
+                                        </div>
+                                    </form>
+                                </div>
+	
+</div>
+<th:block layout:fragment="script">
+	<script th:inline="javascript">
+$(document).ready(function(e){
+	
+	setImg();
+	function setImg(){
+		
+		var imgList=[[${store.imgList}]];
+		var str="";
+		$.each(imgList,function(i,img){
+		var fileCallPath =  encodeURIComponent(img.ipath+ "/s_"+ img.uuid +"_"+img.iname); 
+	 $("#storeImage").append("<img src='/display?fileName="+fileCallPath+"'>");
+		}
+		)
+		
+		
+	}
+	
+});
+</script>
+</th:block>

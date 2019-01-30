@@ -1,0 +1,231 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+<meta charset="utf-8">
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+<title>신상마켓 :: No.1 패션 B2B 플랫폼</title>
+<link rel="stylesheet"
+	href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="/js/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script type="text/javascript"
+	src="https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js"
+	charset="utf-8"></script>
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="594354035805-4nj6gn64kd719tsga2m3hm2djk88g4so.apps.googleusercontent.com">
+<link href="/css/nanumbarungothic.css" type="text/css" rel="stylesheet">
+<link href="/css/common.css" type="text/css" rel="stylesheet">
+<link href="/css/userAdd.css" type="text/css" rel="stylesheet">
+<link href="/css/custom_bootstrap.css" type="text/css" rel="stylesheet" />
+</head>
+<style>
+input[type="checkbox"], input[type="radio"] {
+	display: unset;
+}
+</style>
+<body>
+	<div class="" style="background-color: #ffffff;">
+		<div class="loginFormBox"
+			style="position: relative; background-color: #ffffff; margin-bottom: 30px;">
+			<img class="loginLogo" src="/img/oos_logo.jpg" style="width: 300px; cursor:pointer; margin-bottom:30px;" onclick="location.href='/main'">
+			<form method="post" action="/oos/login" id="loginForm">
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"> 
+					<input class="loginInput" id="username" name="username" type="text" placeholder="아이디"
+					style="color: rgb(51, 51, 51);" value="member3"> <input
+					class="loginInput" id="password" name="password" type="password"
+					placeholder="비밀번호" maxlength="30"
+					style="margin-top: 14px; color: rgb(51, 51, 51);" value="1111">
+				<div class="registrationFont"
+					style="display: inline-block; width: 160px; margin-top: 20px; margin-bottom: 18px; margin-left: 39px;">
+					<input class="btn_autologin" type="checkbox" name="remember-me"
+						checked="true" style="position: relative; top: 2px;"> <label
+						style="width: 160px; font-size: 14px; color: #272727;">15일간로그인 유지</label>
+				</div>
+
+				<div style="text-align: center;">
+					<button type="submit" class="loginButton" style="margin-bottom:10px;">로그인</button>
+					<div style="display:inline-block"><img id="kakaologin"
+					src="//developers.kakao.com/assets/img/about/logos/login/kr/kakao_login_btn_medium_ov.png"
+					width="100" style="cursor:pointer" /></div>
+					<div style="display:inline-block" id="naver_id_login"></div>
+					<div class="g-signin2" style="width:110px; margin-left:10px; display:inline-block" onclick="ClickLogin()" data-onsuccess="onSignIn"></div>
+			<script>
+				var clicked=false;
+				function ClickLogin(){
+				    clicked=true; 
+				}
+				
+			    function onSignIn(googleUser) {
+				    if (clicked){
+				      var profile = googleUser.getBasicProfile();
+				      var auth = googleUser.getAuthResponse();
+				      var token = $("meta[name='_csrf']").attr("content");
+			       	  var header = $("meta[name='_csrf_header']").attr("content");
+			       	  
+				      var googleProfile = {
+			        		sns : "google",
+			        		user_id : profile.getId()+"_google",
+			        		access_token : auth.login_hint,
+				          	expires_in : auth.expires_in,
+				          	token_type : auth.token_type
+				          	/* ,email : profile.getEmail() */
+			        	  }
+				      
+				      $.ajax({
+			            	type:"post",
+			            	data : JSON.stringify(googleProfile),
+			            	url: "/oos/oauth",
+			            	contentType : "application/json; charset=UTF-8",
+			            	 beforeSend: function(xhr) {
+			                     xhr.setRequestHeader(header, token);
+			                 },
+			                 success:function(result, status, xhr){
+			                	 if(JSON.stringify(result.state) == '"new"'){
+			                		 var str = "<input type='hidden' name='access_token' value='"+result.info.access_token+"'>";
+			                 		str += "<input type='hidden' name='sns' value='google'>";
+			                 		str += "<input type='hidden' name='refresh_token' value='"+result.info.refresh_token+"'>";
+			                 		str += "<input type='hidden' name='user_id' value='"+result.info.user_id+"'>";
+			                 		str += "<input type='hidden' name='_csrf' value='"+token+"'>";
+			                 		$("#loginSnsForm").append(str).submit();
+			                 	 }else{
+			                 		 $("#username").attr("name","");
+			                 		$("#password").attr("name","");
+			                		$("#loginForm").append("<input type='hidden' name='username' value='"+result.info.user_id+"'>")
+			                					   .append("<input type='hidden' name='password' value='"+result.info.user_pw+"'>")
+			                					   .submit();
+			                 		};
+			         			}
+			            	});
+				    	}
+		    	}
+			  </script>
+				</div>
+			</form>
+			<!-- //네이버아이디로로그인 버튼 노출 영역 -->
+			<script type="text/javascript">
+			  	var naver_id_login = new naver_id_login("hSK42T1EedOzeZ5CO1b1", "http://localhost:8080/oos/callback");
+			  	var state = naver_id_login.getUniqState();
+			  	naver_id_login.setButton("white", 2,40);
+			  	naver_id_login.setDomain("http://localhost:8080/");
+			  	naver_id_login.setState(state);
+			  	naver_id_login.setPopup();
+			  	naver_id_login.init_naver_id_login();
+			 </script>
+			<div style="position: relative; font-size:16px; text-align:center; margin:30px 0">
+				아직 회원이 아니십니까? <a href='/oos/signup'><strong style="color:#000">일반 회원가입</strong></a>
+			</div>
+			  
+
+		</div>
+		<div class="loginFooter"
+			style="border-top: 1px solid #ddd; height: 110px; min-width: 1100px;">
+			<div class="loginFooterInner"
+				style="width: 1100px; position: relative; margin: 0 auto;">
+
+				<div class="loginFooterContent">
+					<img src="/img/icon_login_cs.png">
+					<div class="loginFooterTitle"
+						style="position: absolute; top: 33px; left: 76px;">신상마켓 고객센터</div>
+					<div class="loginFooterTitle"
+						style="position: absolute; top: 56px; left: 76px; font-weight: normal;">1661
+						- 1916</div>
+				</div>
+				<div class="loginFooterContent" style="left: 275px">
+					<img src="/img/icon_login_email.png">
+					<div class="loginFooterTitle"
+						style="position: absolute; top: 33px; left: 78px;">이메일 문의하기</div>
+					<div class="loginFooterTitle"
+						style="position: absolute; top: 56px; left: 78px; font-weight: normal;">Contact@deali.net</div>
+				</div>
+			</div>
+		</div>
+		<div id="footer" style="background-color: #fff;">
+
+			<div class="footerInner"
+				style="width: 1100px; margin: 0 auto; margin-top: 20px; margin-bottom: 30px; font-size: 13px; color: #9a9a9a; font-weight: 100; line-height: 150%;">
+				주소 : 서울시 동대문구 청계천로 447, 5층(신설동, 한국도자기 빌딩) (주)딜리셔스 대표 : 김준호 개인정보
+				관리책임자 : 조현동<br> 사업자등록번호 : 206-86-50285 통신판매업 신고 :
+				제2011-서울광진-0111호 <br>
+				<br> <span style="color: #000; font-weight: bold;">대표전화
+					: 02-1661-1916</span><br> Contact@deali.net<br> AM 11:00 - PM
+				07:00 (*토, 일, 공휴일 휴무)<br> <span style="font-weight: bold;">©2013-2017
+					dealicious. All right reseved.</span>
+
+			</div>
+		</div>
+	</div>
+	<form id="loginSnsForm" action="/oos/snsSignup" method="post"></form>
+</body>
+<script>
+var token = $("meta[name='_csrf']").attr("content");
+var header = $("meta[name='_csrf_header']").attr("content");
+
+$(document).ajaxSend(function(e,xhr,options){
+    xhr.setRequestHeader(header, token);
+ });
+
+$("#kakaologin").click(function(){
+Kakao.init('0b8ca018eae4b931cf6655a575ea3de6');
+  Kakao.Auth.login({
+         success: function(authObj){
+       	  var token = $("meta[name='_csrf']").attr("content");
+       	  var header = $("meta[name='_csrf_header']").attr("content");
+  	      Kakao.API.request({
+          url: '/v1/user/me',
+          success: function(res) {
+        	  var kakaoProfile = {
+        		sns : "kakao",
+        		user_id : res.id+"_kakao",
+        		access_token : authObj.access_token,
+	          	expires_in : authObj.expires_in,
+	          	token_type : authObj.token_type
+        	  }
+        	  
+            $.ajax({
+            	type:"post",
+            	data : JSON.stringify(kakaoProfile),
+            	url: "/oos/oauth",
+            	contentType : "application/json; charset=UTF-8",
+                 success:function(result, status, xhr){
+                	 if(JSON.stringify(result.state) == '"new"'){
+                		 var str = "<input type='hidden' name='access_token' value='"+result.info.access_token+"'>";
+                 		str += "<input type='hidden' name='sns' value='kakao'>";
+                 		str += "<input type='hidden' name='refresh_token' value='"+result.info.refresh_token+"'>";
+                 		str += "<input type='hidden' name='user_id' value='"+result.info.user_id+"'>";
+                 		str += "<input type='hidden' name='_csrf' value='"+token+"'>";
+                 		$("#loginSnsForm").append(str).submit();
+                 	 }else if(JSON.stringify(result.state) == '"fail"'){
+                 		
+                 		alert("한번 회원탈퇴 시 같은 아이디로 로그인 할 수 없습니다.");
+                 		return;
+                 	 }else if(JSON.stringify(result.state) == '"old"'){
+                 		 $("#username").attr("name","");
+                  		$("#password").attr("name","");
+                 		$("#loginForm").append("<input type='hidden' name='username' value='"+result.info.user_id+"'>")
+                 					   .append("<input type='hidden' name='password' value='"+result.info.user_pw+"'>")
+                 					   .submit();
+                 	 };
+         		}
+            });
+            
+          },
+          fail: function(error) {
+            //alert(JSON.stringify(error));
+          }
+        });
+       	 
+         },
+         fail: function(err) {
+           alert(JSON.stringify(err));
+         }
+       });
+
+})
+</script>
+</html>

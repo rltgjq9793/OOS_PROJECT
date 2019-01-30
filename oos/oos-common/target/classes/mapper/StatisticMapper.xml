@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.oos.mapper.StatisticMapper">
+
+
+	 <select id="Statistic">
+	 
+	 select * from tbl_statistic
+	 order by stno desc;
+	 
+	 </select>
+	 
+	 
+	 	<select id="total" parameterType="map" resultType="Integer">
+		select
+		ifnull((sum(od.qty*p.price)),1)
+		
+		from
+		tbl_order_detail od join tbl_product p on
+		od.pno=p.pno
+		where
+		<choose>
+			<when test=" range == 'day'">
+				date(od.regdate) =date(now())
+			</when>
+			<when test="range == 'week'">
+				<![CDATA[
+				date(od.regdate) >=date(subdate(now(),interval 7 day )) and date(od.regdate)<= date(now()) 
+				]]>
+			</when>
+			<when test="range == 'month'">
+			<![CDATA[
+			date(od.regdate) >=date_format(now(),'%Y-%m-01') and date(od.regdate)<=last_day(now()) 
+			]]>
+			</when>
+		</choose>
+		and od.odno>0 and od.del='N' and od.sno=#{sno};
+	</select>
+	                                                                                         
+</mapper>

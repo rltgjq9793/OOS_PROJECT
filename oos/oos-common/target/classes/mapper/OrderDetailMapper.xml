@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.oos.mapper.OrderDetailMapper">
+
+	<resultMap type="org.oos.domain.ProductOptionVO" id="Option">
+		<result column="opno" property="opno" />
+		<result column="size" property="size" />
+		<result column="qty" property="qty" />
+	</resultMap>
+
+	<resultMap type="org.oos.domain.ProductImgVO" id="Img">
+		<result column="uuid" property="uuid" />
+		<result column="pno" property="pno" />
+		<result column="iname" property="iname" />
+		<result column="ipath" property="ipath" />
+	</resultMap>
+
+	<resultMap type="org.oos.domain.ProductVO" id="Product">
+		<result column="pno" property="pno" />
+		<result column="pname" property="pname" />
+		<result column="price" property="price" />
+		<result column="sno" property="sno" />
+		<result column="regdate" property="regdate" />
+		<result column="updatedate" property="updatedate" />
+		<result column="del" property="del" />
+		<result column="questionreplycnt" property="questionReplyCnt" />
+		<result column="reviewreplycnt" property="reviewReplyCnt" />
+		<result column="content" property="content" />
+	</resultMap>
+
+	<resultMap type="org.oos.domain.OrderDetailVO"
+		id="OrderDetail">
+		<result column="odno" property="odno" />
+		<result column="ono" property="ono" />
+		<result column="pno" property="pno" />
+		<result column="qty" property="qty" />
+		<result column="opno" property="opno" />
+		<result column="pnum" property="pnum" />
+		<result column="name" property="name" />
+		<result column="address" property="address" />
+		<result column="regdate" property="regdate" />
+		<result column="addressDetail" property="addressDetail" />
+		<result column="dno" property="dno" />
+		<result column="del" property="del" />
+		<result column="sno" property="sno" />
+		<result column="detail_state" property="detail_state" />
+		<collection property="option" resultMap="Option" />
+		<collection property="product" resultMap="Product" />
+		<collection property="img" resultMap="Img" />
+	</resultMap>
+
+
+	<select id="getByOdno" resultMap="OrderDetail">
+		select * from tbl_order_detail
+		od left join tbl_product p
+		on od.pno =p.pno left join tbl_product_option o on od.pno=o.pno
+		where od.odno=#{odno}
+	</select>
+	
+	<select id="stateCount" resultType="Integer">
+		select count(*)
+		from tbl_order_detail
+		where
+		<choose>
+			<when test=" state == 'ready'">
+			detail_state='준비중' and
+			</when>
+			<when test=" state == 'shipping'">
+			detail_state='배송중' and
+			</when>
+			<when test=" state == 'complete'">
+			detail_state='배송완료' and
+			</when>
+		</choose>
+			odno>0 and del='N' and sno=#{sno}
+	</select>
+	
+	<select id="total" parameterType="map" resultType="Integer">
+		select
+		ifnull((sum(od.qty*p.price)),1)
+		
+		from
+		tbl_order_detail od join tbl_product p on
+		od.pno=p.pno
+		where
+		<choose>
+			<when test=" range == 'day'">
+				date(od.regdate) =date(now())
+			</when>
+			<when test="range == 'week'">
+				<![CDATA[
+				date(od.regdate) >=date(subdate(now(),interval 7 day )) and date(od.regdate)<= date(now()) 
+				]]>
+			</when>
+			<when test="range == 'month'">
+			<![CDATA[
+			date(od.regdate) >=date_format(now(),'%Y-%m-01') and date(od.regdate)<=last_day(now()) 
+			]]>
+			</when>
+		</choose>
+		and od.odno>0 and od.del='N' and od.sno=#{sno};
+	</select>
+	
+	
+	
+	
+<!-- 	<select id="getList" resultType="org.oos.domain.OrderDetailVO">
+		select * from tbl_order_detail
+		where odno > 0 and ono = #{ono} and del='N'
+		order by odno desc
+	</select> -->
+
+	<select id="getListByOno"
+ 		resultMap="OrderDetail">
+		select * from tbl_order_detail od left join tbl_product p 
+		on od.pno =p.pno left join tbl_product_option o on od.pno=o.pno left join tbl_product_img i
+	    on od.pno = i.pno
+		where od.ono=#{ono} and od.del = 'N'
+	</select>
+
+	<select id="count" resultType="int">
+		select count(*) from
+		tbl_order_detail
+		where odno > 0 and ono = #{ono} and del='N'
+	</select>
+
+	<select id="get" resultType="org.oos.domain.OrderDetailVO">
+		select * from tbl_order_detail
+		where odno = #{odno}
+	</select>
+
+	<insert id="insert">
+		insert into tbl_order_detail(ono, pno, qty, opno,
+		pnum, name, address, addressDetail,sno)
+		value(#{ono}, #{pno}, #{qty},
+		#{opno}, #{pnum}, #{name}, #{address},
+		#{addressDetail},#{sno})
+	</insert>
+
+	<update id="modify" parameterType="map">
+		update tbl_order_detail
+		set detail_state = #{detail_state}
+		,  dno = #{dno}
+		where odno = #{odno}
+	</update>
+
+	<update id="delete">
+		update tbl_order_detail set del = "Y"
+		where odno =
+		#{odno}
+	</update>
+
+<!-- 	<select id="orderList" parameterType="map"
+		resultType="org.oos.domain.OrderDetailVO">
+		select * from tbl_order_detail
+		where odno > 0 and sno =
+		#{sno} and del='N'
+		order by odno desc
+		limit #{dto.cri.skip},
+		#{dto.cri.amount}
+	</select> -->
+	
+	<select id="getListBySno" parameterType="map" resultMap="OrderDetail">
+		select od.odno, od.dno, od.regdate, p.pname, op.size, od.qty, od.detail_state, od.name, p.price 
+		from tbl_order_detail od
+		left join tbl_product p
+		on p.pno = od.pno
+        left join tbl_product_option op
+        on op.opno = od.opno
+		where od.del = 'N' and od.odno > 0
+		and od.sno = #{sno}
+	</select>
+
+	<update id="deleteAll">
+		update tbl_order_detail set del = "Y"
+		where ono =
+		#{ono}
+	</update>
+
+
+	<select id="snoCount" resultType="int">
+		select count(*) from
+		tbl_order_detail
+		where odno > 0 and sno = #{sno} and del='N'
+	</select>
+
+</mapper>

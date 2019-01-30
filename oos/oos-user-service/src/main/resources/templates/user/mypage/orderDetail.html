@@ -1,0 +1,210 @@
+<!DOCTYPE>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_name" th:content="${_csrf.parameterName}"/>
+<title>상품 상세정보</title>
+<link href="/css/userAdd.css" type="text/css" rel="stylesheet">
+<link href="/css/common.css" type="text/css" rel="stylesheet">
+<script src="/js/jquery.min.js"></script>
+</head>
+<body>
+	<style>
+td {
+	text-align: center;
+}
+.detail_con{
+	padding:20px 0 20px 20px;
+}
+
+.myPageSheetTable{
+	border-top:1px solid #d7d7d7;
+}
+
+.read{
+	border:0px; 
+	background:transparent; 
+	width:80px;
+	font-size:16px;
+	color:#666;
+	margin: 5px auto;
+}
+.myPageSheetTable th{
+	border-top: 0px;
+	border-bottom: 1px solid #d7d7d7;
+    font-weight: bold;
+    color:#333;
+    height: 45px;
+    font-size:14px;
+}
+
+.cell{
+	border-left: 1px solid #d7d7d7;
+    color:#333;
+}
+
+input {
+    border: none;
+    outline-style:none;
+    background:transparent;
+}
+.personalTd{
+	font-size:13px;
+	height:38px;
+}
+
+.headTitle{
+	padding:0 10px	
+}
+
+.joinInput{
+	height:30px;
+}
+
+::-webkit-scrollbar {width: 12px; height: 12px;  }
+::-webkit-scrollbar-button:start:decrement, 
+::-webkit-scrollbar-button:end:increment {display: block; width: 12px;height: 12px; background: url() rgba(0,0,0,.05);}
+::-webkit-scrollbar-track {     background: #ff7f7a; }
+::-webkit-scrollbar-thumb {  background:#ff7f7a;  }
+</style>
+<div class="myPageContentArea" style="position: relative;">
+		<div class="orderlistArea"
+			style="left: 225px; width: 600px;">
+
+			<table class="myPageSheetTable" style="width: 569px; margin:0 auto">
+				<colgroup>
+					<col width="90">
+					<col width="90">
+					<col width="70">
+					<col width="105">
+					<col width="100">
+					<col width="150">
+					<col width="90">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>주문번호</th>
+						<th>주문상품</th>
+						<th>수량</th>
+						<th>결제금액</th>
+						<th>상태</th>
+						<th>배송조회</th>
+						<th >주문취소</th>
+					</tr>
+				</thead>
+				<tbody id="orderList_tbody" th:if="${detail != 'null'}" th:each="arr: ${detail}">
+					<tr class="height100">
+					<input type="hidden" id="ono" th:value="${detail[0].ono}">
+						<td class="" th:text="${arr.odno}"></td>
+						<td class="">
+							<div class="td_info">
+								<input type="hidden" class="hiddenImg" th:data-odno="${arr.odno}"
+									th:data-ipath="${arr.img.ipath}" th:data-uuid="${arr.img.uuid}" 
+									th:data-iname="${arr.img.iname}">
+								<ul>
+									<li class="tit_info">
+										<a th:href="|javascript:window.open('/store/detail?pno=${arr.pno}')|"> 
+											<img th:class="|img_${arr.odno}|" style="width:50px;"><br/>
+											<span th:text="${arr.product.pname}"></span>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</td>
+						<td th:text="|${arr.qty} 개|"></td>
+						<td th:text="|${arr.product.price}원|"></td>
+						<td th:text="${arr.detail_state}">STATE</td>
+						<td>
+							<div th:if="${arr.detail_state == '배송중' or arr.detail_state == '배송완료'}" 
+								style="cursor:pointer; font-weight:bold; color: #1a0dab;text-decoratin:underline"
+								th:id="|${arr.dno}|" class="searchDno">배송조회</div>
+							<div th:if="${arr.detail_state == '준비중'}" > - </div>
+						</td>
+						<td th:if="${arr.detail_state == '준비중'}" >
+							<button type="submit"
+								class="basketSwapBtn orderRemove"  th:id="${arr.odno}" style="width:70px; color:#fff; background:#ff7f7a" 
+								th:data-ono="${arr.odno}">주문취소</button>
+						</td>
+						<td th:if="${arr.detail_state == '배송중' or arr.detail_state == '배송완료'}" >
+							취소불가
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<table th:if="${detail != 'null'}" style=" border-top:1px solid #d7d7d7; 
+				border-left:1px solid #d7d7d7; margin:50px auto">
+                    <tr>
+                    	<td class="personalTd headTitle" style="">수령인명</td>
+                    	<td class="personalTd" style="position:relative;">
+                    		<input type="text" th:value="${detail[0].name}"
+                    		readonly="readonly" class="joinInput">
+                    	</td>
+                    </tr>
+                    <tr>
+                    	<td class="personalTd headTitle" style="">연락처</td>
+                    	<td class="personalTd" style="position:relative;">
+                    		<input type="hidden" id="hiddenPnum" th:value="${detail[0].pnum}">
+                    		<input type="text" id="pnum" readonly="readonly" class="joinInput">
+                    	</td>
+                    </tr>
+                    <tr>
+                    	<td class="personalTd headTitle" style="">주소</td>
+                    	<td class="personalTd" style="position:relative;">
+                    		<input type="hidden" id="hiddenAddress" 
+                    			th:value="${detail[0].address}">
+                    		<input type="hidden" id="hiddenDetail" 
+                    			th:value="${detail[0].addressDetail}">
+                    		<input type="text" id="address" readonly="readonly" class="joinInput">
+                    	</td>
+                    </tr>
+           </table>
+		</div>
+	</div>
+	<form id="orderDetailForm" method="post" action="/user/mypage/orderDetail">
+	
+	</form>
+</body>
+
+<script>
+$(document).ready(function(){
+	var token = $("meta[name='_csrf']").attr("content");
+	var csrfName = $("meta[name='_csrf_name']").attr("content");
+	var tel = $("#hiddenPnum").val();
+	
+	(function(){
+		$.each($(".hiddenImg"), function(index, item){
+			
+			var fileCallPath =  encodeURIComponent(
+					item.dataset.ipath+ "/s_"+ item.dataset.uuid +"_"+item.dataset.iname);
+			
+			var imgDiv= $('.img_'+item.dataset.odno);
+			imgDiv.attr("src","/display?fileName="+fileCallPath);
+		}); 
+		
+	 	$("#pnum").val(String(tel).substring(0,3) +" - "+ 
+				String(String(tel).substring(3,7)) +" - "+ String(String(tel).substring(7))); 
+	 	$("#address").val($("#hiddenAddress").val()+" "+$("#hiddenDetail").val())
+	})();
+	
+	
+	
+	$(".orderRemove").click(function(){
+		$("#orderDetailForm").append("<input type='hidden' name='odno' value='"+$(this).attr("id")+"'>")
+							.append("<input type='hidden' name='ono' value='"+$("#ono").val()+"'>")
+							.append("<input type='hidden' name='"+csrfName+"' value='"+token+"'>")
+							.submit();
+	}); 
+	
+	$(".searchDno").click(function(){
+		var popOption = "width=630, height=550, resizable=no, scrollbars=no, status=no;"; //팝업창 옵션(optoin)
+		window.open("https://tracker.delivery/#/kr.logen/"
+				+ $(this).attr("id"), "delivery",
+				popOption);
+	});
+	
+});
+</script>
+
+</html>

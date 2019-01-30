@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="org.oos.mapper.NotifyMapper">
+  
+  <select id="getList" parameterType="map" resultType="org.oos.domain.NotifyVO">
+  select * from tbl_seller_notify
+  where sbno > 0 and sid = #{sid} and del = 'n' and state ='OFF'
+  order by sbno desc
+  limit #{dto.cri.skip}, #{dto.cri.amount}
+  </select>
+  
+  <select id="popupList" resultType="org.oos.domain.NotifyVO">
+  		 select n.* ,s.sname ,s.sno
+ 		 from tbl_seller_notify n left join tbl_store s
+		 on n.sid = s.owner
+ 		 where n.sid=#{sid} and n.sbno>0 and n.del='N' and n.state='ON'
+		 order by updatedate desc
+  	</select>
+  	
+
+  
+  <delete id="delete">
+  update tbl_seller_notify
+  set del='y'
+  where sbno = #{sbno}
+  </delete>
+  
+  <update id="modify">
+  update tbl_seller_notify
+  set content = #{content}, title = #{title}, regdate=now(), updatedate = now() 
+  where sbno = #{sbno}	
+  </update>
+  
+  <insert id="insert">
+  insert into tbl_seller_notify(title, content, sid)
+		values(#{title},#{content},#{sid})
+  </insert>
+  
+  <select id="get" resultType="org.oos.domain.NotifyVO">
+  		select * from tbl_seller_notify
+		where sbno = #{sbno}
+  </select>
+  
+  <select id="sidCount" resultType="int">
+  		select count(*) from tbl_seller_notify
+		where sbno > 0 and sid = #{sid} and del = 'N'
+  </select>
+  
+  <select id="count" resultType="int">
+		select count(*) from tbl_seller_notify
+		where sno > 0 and sno = #{sno} and del='N'
+</select>	
+	
+	<update id="popupSwitch" parameterType="map">
+		update tbl_seller_notify
+		set state = #{switch}
+		where sbno =#{sbno}
+	</update>
+	  	 	
+  	<select id="getPopup" resultType="org.oos.domain.NotifyVO">
+  		select * from tbl_seller_notify
+		where sbno = #{sbno} and state='ON'
+  	</select>
+  	
+  	  <select id="popupCount" resultType="int">
+  		select count(*) from tbl_seller_notify
+		where sbno > 0 and sid = #{sid} and del = 'N' and state='ON'
+  </select>
+  	
+  </mapper>

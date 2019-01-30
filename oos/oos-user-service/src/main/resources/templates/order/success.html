@@ -1,0 +1,184 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/shopLayout}">
+
+<div class="container" style="margin-top: 20px;"
+	layout:fragment="container"  th:with="member = ${#authentication.principal.member}">
+	<style>
+		.successBox td{
+			font-size:20px;
+			padding-top:20px;
+		}
+		
+		.orderInfo{
+			padding:7px 0;
+			font-size:14px;
+		}
+	</style>
+	<div style="font-family:'unset'; font-size:20px;text-align: center"><strong>결제가 완료되었습니다.</strong></div>
+	<div class="shoppingBasketArea" style="">
+		<div class="displayTable" style="height: 65px;">
+			<tbody id="basketAllTable">
+				<div class="floatArea" style="display:block; height:150px; width:720px;margin:20px auto">
+					<div class="floatMenu" style="width:100%">
+						<table class="buyNPriceTable" cellspacing="0"
+							style="width: 100%; color: #202225;">
+							<tbody>
+								<tr class="successBox">
+									<td class="floatTableText"
+										style="border-bottom: 1px solid #e1e1e1;">총 금액</td>
+									<td class="floatTableNumber"
+										style="border-bottom: 1px solid #e1e1e1; text-align: right; color: #ff5252;"><span
+										class="d_totalPrice">0</span>원</td>
+								</tr>
+								<tr>
+									<td colspan="2" style="height: 10px;"></td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<button class="orderBtn" 
+										style="background-color: #00bfa5; border: 1px solid #00bfa5;">리스트로 가기</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div style="font-family:'unset'; font-size:18px;text-align: center"><strong>주문내역</strong></div>
+				<div style="display:block; width: 760px; margin:20px auto">
+					
+					<div style="border-bottom: 4px solid #e5e5e5; width: 760px;"></div>
+						<table cellspacing="0" class="goods basketGoodsTableMiddle" th:each="arr:${order}"
+								style="width: 760px;">
+								<tbody style="display:inline-block; width:390px;">
+									<tr style="display:inline-block" >
+										<td class="checkBoxTd borderBottom">
+											<div class="check_box">
+												<input type="checkbox"></label>
+											</div>
+										</td>
+										<td class="height90 borderBottom " colspan="4"
+											style="text-align: left;">
+											<div class="shoppingGoodsThumbnail" style="display: inline-block;">
+												<img th:class="|thumb_${arr.product.pno}|" style="width: 40px; display: inline-block; vertical-align: middle;">
+											</div>
+											<div style="display: inline-block; margin-left: 6px; width:200px; vertical-align: middle;">
+												<div class="basketGoodsName" style="width: 360px;">
+													<a class="modalOpen" style="color: #333;" th:text="${arr.product.pname}">PNAME</a>
+													<div class="basketGoodsDeleteBtn"></div>
+												</div>
+												<div class="basketStoreInfo"
+													style="font-size: 15px; margin-top: 6px;"  th:text="|${arr.product.price}원|">PRICE</div>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+									<tbody style="display:inline-block; width:300px;">
+										<tr th:if="${arr.qty != 0}" th:id="|option_${arr.option.opno}|">
+											<td class="borderRight" colspan="5" style="border-spacing: 0px;">
+												<table cellspacing="0" style="width: 100%;">
+													<tbody>
+														<tr class="height60 optionClass">
+															<td class="textLeft basketOptionArea" th:text="${arr.option.size}">SIZE</td>
+															<td class=" upDownTd">
+																<div class="upDownDiv">
+																	<input class="upDownNumArea" type="text" name="price"
+																		th:value="|${arr.qty}개|" placeholder="0" readonly="readonly">
+																</div>
+															</td>
+														
+														</tr>
+													</tbody>
+												</table>
+											</td>
+											<td class="basketGoodsSumPrice">
+												<span th:class="|success price_${arr.pno}|" 
+												th:data-price="${arr.product.price*arr.qty}" th:text="${arr.product.price*arr.qty}">PRICE
+												</span><strong>원</strong>
+											</td>
+										</tr>
+									</tbody>
+							</table>
+							<table id="payMethodTable_0" class="basketGoodsTableEnd"
+							cellspacing="0" style="width: 760px;  border-top: 4px solid #e5e5e5;">
+							
+							<tbody>
+								<tr class="paymentOption" style="height: 102px;">
+									<td class="" colspan="6"
+										style="padding: 0 30px; border-spacing: 10px;">
+										<div class="payMethodInputArea" style="height: 54px;">
+											<div class="orderInfo"><strong  th:text="${order[0].name}">NAME</strong></div>
+											<div class="orderInfo" th:text="${order[0].address}">Address</div>
+											<div class="orderInfo" th:text="${order[0].addressDetail}">AddressDetail</div>
+											<div class="orderInfo" th:text="${order[0].pnum}" style="color:#9b9b9b">전화번호</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+			
+					<!-- <table class="basketGoodsTableEnd" cellspacing="0"
+						style="width: 760px;">
+						<tbody>
+						</tbody>
+					</table> -->
+				</div>
+			</tbody>
+
+			<div id="basketSSCTitle" style="display: none; padding: 30px 0px;">
+				<img src="../img/bg_cart_ssc_title_banner_01.png"
+					style="width: 100%;">
+			</div>
+		</div>
+	</div>
+
+</div>
+<th:block layout:fragment="script">
+	<script th:inline="javascript">
+	$(document).ready(function(){
+		
+		var orderList = [[${order}]];
+		
+		(function() {
+			var sum = 0;
+			var totalSum = 0;
+			
+			 $.each(orderList, function(index, item){ 
+				var pno = item.pno;
+				var opno = item.opno;
+			
+					var eachPrice = $(".basketGoodsSumPrice").find('.price_'+pno);
+				
+					$.each(eachPrice, function(index, item){
+						sum += Number(item.dataset["price"]);
+						
+					}); 
+					
+					var img =  item.img;
+					var fileCallPath =  encodeURIComponent(img.ipath+ "/s_"+ img.uuid +"_"+img.iname);
+					
+					$.each($('.thumb_'+ item.pno),function(){
+						$(this).attr("src","/display?fileName="+fileCallPath); 
+					});
+					
+					$(".sumPrice_"+pno).html(sum+"원");
+					$(".sumPrice_"+pno).attr("data-sum",sum);
+				
+			});  
+			 
+			
+		 	 $.each($(".success"), function(index, item){ 
+				 totalSum += Number(item.dataset["price"]);
+			 });
+			 
+			 $(".d_totalPrice").html(totalSum);
+		})();
+		
+		$(".orderBtn").click(function(){
+			window.location.href = '/main';
+		})
+		
+	});
+	</script>
+</th:block>	
+</html>

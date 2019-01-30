@@ -1,0 +1,95 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/mypageLayout}">
+
+
+
+<div class="container" style="margin-top: 20px;"
+	layout:fragment="Mcontainer">
+
+
+
+
+	<div class="wishlistArea"
+		style="position: relative; margin-top: -315px; left: 225px; width: 800px; margin-bottom: 68px; min-height: 600px;">
+		<div style="font-size: 20px; color: #202225; height: 40px;">My
+			REVIEW</div>
+
+		<table class="myPageSheetTable" cellspacing="0" style="width: 100%;">
+			<colgroup>
+				<col width="80">
+				<col width="150">
+				<col width="350">
+				<col width="80">
+				<col width="150">
+			</colgroup>
+			<thead>
+				<tr
+					style="background-color: #fff; padding: 0px; text-align: center;'">
+					<th class="">문의 유형</th>
+					<th class="">상품명</th>
+					<th class="">리뷰내용</th>
+					<th class="">별점</th>
+					<th class="">등록일</th>
+				</tr>
+			</thead>
+			<tbody id="questionlist_tbody">
+				<tr class="height60" th:each=arr:${reply}>
+					<td class="">REVIEW</td>
+					<td class="replyTitle" th:text="${arr.product.pname}"
+						th:onclick="|location.href='/store/detail?pno=${arr.pno}'|"></td>
+					<td class="replyTitle go" th:id="|ono_${arr.rno}|"
+						th:data-pno="|${arr.pno}|" th:data-parent="|${arr.parent}|"
+						th:text="${arr.title}"></td>
+					<td class="" style="color: #43a047" th:text="${arr.score}"></td>
+					<td class="" th:text="${#dates.format(arr.regdate,'yyyy-MM-dd')}"></td>
+				</tr>
+			</tbody>
+		</table>
+		<div style="width: 800px; height: 28px; margin: 20px 0;"></div>
+		<div style="text-align: center;" th:if="${#lists.size(pageList) gt 1}">
+			<div class="pageControlLeft" th:if="${pageMaker.prev} == true"></div>
+			<div class="showPage"
+				style="display: inline-block; vertical-align: top;"
+				th:each="page : ${pageList}">
+				<button class="pageNum pageNumber" th:id="|page_${page}|"
+					th:text="${page}">1</button>
+			</div>
+			<div class="pageControlRight" th:if="${pageMaker.next} == true"></div>
+		</div>
+	</div>
+	<form id="reviewForm" method="get">
+		<input type="hidden" name="pageNum" id="pageNum" /> <input
+			type="hidden" name="mid" />
+	</form>
+</div>
+
+
+<th:block layout:fragment="script">
+	<script th:inline="javascript">
+	var reply = [[${reply}]];
+	var pageMaker = [[${pageMaker}]];
+	var reviewForm = $("#reviewForm");
+	(function(){
+
+		$("#pageNum").val(pageMaker.cri.pageNum);
+		$("#page_"+pageMaker.cri.pageNum).attr("style","color:#ff7f7a;");
+	})();
+	
+	$(".go").click(function() {
+		
+		var pno = $(this).data("pno");
+		var parent = $(this).data("parent");
+		
+		location.href="/user/mypage/reviewDetail?pno="+pno+"&parent="+parent;
+	});
+	
+	$(".pageNum").click(function(e) {
+		$("#pageNum").val($(this).attr("id").substring(5));
+		reviewForm.submit();
+	});
+	
+	
+	</script>
+</th:block>
+</html>

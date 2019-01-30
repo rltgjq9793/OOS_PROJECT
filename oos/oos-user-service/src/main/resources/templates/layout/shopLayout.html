@@ -1,0 +1,330 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="utf-8">
+<meta name=viewport content=width=device-width,user-scalable=no>
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+<meta name="_csrf_name" th:content="${_csrf.parameterName}" />
+<title>신상마켓 :: No.1 패션 B2B 플랫폼</title>
+<link rel="stylesheet"
+	href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="/js/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link href="/css/nanumbarungothic.css" type="text/css" rel="stylesheet">
+<link href="/css/common.css" type="text/css" rel="stylesheet">
+<link href="/css/custom_bootstrap.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+	<div class="wrap">
+		<div class="header" style="height: 148px;">
+
+			<div class="sinsangLogoArea"
+				onmouseover="javascript:$('.textImg').removeClass('hover')">
+				<div class="logo">
+					<a href="/main" style="text-decoration: none; color: #9a9a9a;">
+						<div class="logoInner" style="cursor: pointer; font-size: 13px;">
+							<img src="/img/oos_logo.jpg" style="width: 200px;">
+						</div>
+					</a>
+				</div>
+
+				<div class="recommendationKeywordOuter">
+					<div class="recommendationKeyword">
+						<div class="layoutSelectBox"
+							style="position: absolute; left: 50%; margin-left: -177px; bottom: 39px;">
+							<div
+								style="position: relative; width: 350px; height: 38px; border: 2px solid #ff7f7a;">
+								<button id="searchOptionSelect" class="selectBox">상품 검색</button>
+								<div id="searchOptionList" class="MultipleSelectBox vertical"
+									unselectable="off" tabindex="0">
+									<li class="selectSearchLi" id="select1" data-type="product"
+										style="margin-top: 8px;">상품 검색</li>
+									<li class="selectSearchLi" id="select2" data-type="store">매장
+										검색</li>
+
+								</div>
+
+								<input type="text" id="searchText"
+									style="width: 190px; height: 36px; border: 0px; margin-top: 1px; padding: 0px; font-size: 13px; display: inline-block; padding-left: 10px; color: 000;"
+									placeholder="검색어를 입력해주세요."> <img
+									src="/img/search_btn.png" class="goSearch" align="middle"
+									style="position: absolute; width: 21px; height: 21px; right: 10px; top: 8px; cursor: pointer;">
+
+								<div class="autoCompleteArea" style="">
+									<script type="text/javascript">
+										var token = $("meta[name='_csrf']")
+												.attr("content");
+										var header = $(
+												"meta[name='_csrf_header']")
+												.attr("content");
+										$(function() {
+											$.ajax({
+												type : "post",
+												url : "/" + type
+														+ "/autocomplete",
+												beforeSend : function(xhr) {
+													xhr.setRequestHeader(
+															header, token);
+												},
+												success : function(result,
+														status, xhr) {
+													$("#searchText")
+															.autocomplete({
+																source : result
+															});
+												}
+											});
+										});
+										var search = $("#searchOptionSelect");
+										var type = 'product';
+										$(".selectSearchLi")
+												.on(
+														"click",
+														function() {
+															search.text($(this)
+																	.text());
+															type = $(this)
+																	.data(
+																			"type");
+
+															$(function() {
+																$
+																		.ajax({
+																			type : "post",
+																			url : "/"
+																					+ type
+																					+ "/autocomplete",
+																			beforeSend : function(
+																					xhr) {
+																				xhr
+																						.setRequestHeader(
+																								header,
+																								token);
+																			},
+																			success : function(
+																					result,
+																					status,
+																					xhr) {
+																				$(
+																						"#searchText")
+																						.autocomplete(
+																								{
+																									source : result
+																								});
+																			}
+																		});
+															});
+															slideUp();
+														})
+									</script>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="baseMenuOuter"
+						style="position: absolute; right: 0px; margin-top: -5px;">
+						<div class="baseMenu" style="display: table;">
+							<div sec:authorize="hasRole('ROLE_USER')" class="baseMenuInner"
+								style="cursor: default;">
+								<strong sec:authentication="principal.member.mname">name</strong>
+								<input type="hidden" id="userMid"
+									th:value="${#authentication.principal.member.mid}"> <span
+									id="logout" style="cursor: pointer; padding: 0px 10px;">로그아웃</span>
+							</div>
+							<div sec:authorize="!hasRole('ROLE_USER')" class="baseMenuInner"
+								style="cursor: default;">
+								<span id="login" style="cursor: pointer; padding: 0px 10px;">로그인</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="topMenuHeight"
+			style="height: 53px; width: 100%; display: none;"></div>
+		<div class="topMenu" style="position: relative; margin-top: 0px;">
+			<div class="innerMenu" style="">
+				<table class="innerMenuTable" cellspacing="0">
+					<tbody>
+						<tr>
+							<td id="allSinsang" style="padding-right: 20px;"
+								onclick="javascript:location.href='/user/list'">
+								<div class="textImg active" style="margin-top: 3px;">전체신상</div>
+							</td>
+							<td id="ShopSinsang" class="AllCategory"
+								style="width: 166px; padding: 0px;" data-cat="shop">
+								<div class="textImg" style="margin-top: 3px; color: #43a047">전체상점</div>
+							</td>
+							<td id="OuterSinsang" class="bigCategory"
+								style="width: 166px; padding: 0px;" data-cat="outer"
+								onmouseover="categoryMenuShow(2)"
+								onmouseout="javascript:$('.Outer_Menu').hide()">
+								<div class="textImg" style="margin-top: 3px;">아우터</div>
+							</td>
+							<td id="TopSinsang" class="bigCategory"
+								style="width: 166px; padding: 0px;" data-cat="top"
+								onmouseover="javascript:categoryMenuShow(1)"
+								onmouseout="javascript:$('.Top_Menu').hide()">
+								<div class="textImg" style="margin-top: 3px;">상의</div>
+							</td>
+							
+							<td id="BottomSinsang" class="bigCategory"
+								style="width: 166px; padding: 0px;" data-cat="bottom"
+								onmouseover="categoryMenuShow(3)"
+								onmouseout="javascript:$('.Bottom_Menu').hide()">
+								<div class="textImg" style="margin-top: 3px;">바지</div>
+							</td>
+							<td id="EtcSinsang" style="width: 166px; padding: 0px;"
+								data-cat="etc" onmouseover="categoryMenuShow(4)"
+								onmouseout="javascript:$('.Etc_Menu').hide()">
+								<div class="textImg">악세사리</div>
+							</td>
+							<td style="width: 400px; padding: 0px;"
+								onmouseover="javascript:$('.textImg').removeClass('hover')"></td>
+							<td style="width: 400px; padding: 0px; cursor: unset;"></td>
+
+							<td style="width: 60px;" sec:authorize="hasRole('ROLE_USER')">
+								<div class="fixedCart" onclick="goShoppingBasket()"
+									onmouseover="javascript:$('.fixedCart .fixedMenuHoverBox').show()"
+									onmouseout="javascript:$('.fixedCart .fixedMenuHoverBox').hide()"
+									style="margin-left: 30px; position: relative;">
+									<div class="fixedMenuHoverBox">장바구니</div>
+								</div>
+							</td>
+							<td style="width: 82px;" sec:authorize="hasRole('ROLE_USER')">
+								<div class="fixedZzim"
+									onmouseover="javascript:$('.fixedZzim .fixedMenuHoverBox').show()"
+									onmouseout="javascript:$('.fixedZzim .fixedMenuHoverBox').hide()"
+									style="margin-left: 34px; margin-right: 24px; position: relative;">
+									<div class="fixedMenuHoverBox">찜리스트</div>
+								</div>
+							</td>
+
+							<td class="mypageTD" sec:authorize="hasRole('ROLE_USER')"
+								onmouseover="javascript:$('#myPageSelectBoxDiv').show(), $('.fixedMypage').addClass('acitve')"
+								onmouseout="javascript:$('#myPageSelectBoxDiv').hide()"
+								style="width: 34px; position: relative; cursor: pointer;">
+								<div class="fixedMypage" title="마이 페이지"
+									style="margin-left: 10px;"></div> <!--  -->
+								<div class="myPage_box" id="myPageSelectBoxDiv"
+									onmouseover="javascript:$('#myPageSelectBoxDiv').show()"
+									onmouseout="javascript:$('#myPageSelectBoxDiv').hide()"
+									style="position: absolute; top: 48px; left: -166px; z-index: 2; background-color: #fff; display: none;">
+									<ul class="myPageMenu" onclick="myPageMove(1)">
+										<li>내 정보 수정<span class="css-arrow"></span></li>
+
+									</ul>
+									<ul class="myPageMenu" onclick="myPageMove(2)">
+										주문내역
+										<span class="css-arrow"></span>
+									</ul>
+									<ul class="myPageMenu" onclick="myPageMove(4)">
+										문의내역
+										<span class="css-arrow"></span>
+									</ul>
+									<ul class="myPageMenu" onclick="myPageMove(3)">
+										리뷰내역
+										<span class="css-arrow"></span>
+									</ul>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+
+			</div>
+			<div class="Outer_Menu"
+				onmouseover="javascript:$('.Outer_Menu').show()"
+				onmouseout="javascript:$('.Outer_Menu').hide()">
+				<ul class="top_ul">
+					<li class="TopLi" data-cat="padding">패딩</li>
+					<li class="TopLi" data-cat="coat">코트</li>
+					<li class="TopLi" data-cat="jacket">재킷</li>
+				</ul>
+			</div>
+
+			<div class="Top_Menu" onmouseover="javascript:$('.Top_Menu').show()"
+				onmouseout="javascript:$('.Top_Menu').hide()">
+				<ul class="top_ul">
+					<li class="TopLi" data-cat="knit">니트</li>
+					<li class="TopLi" data-cat="tshirt">티셔츠</li>
+					<li class="TopLi" data-cat="shirt">셔츠</li>
+					<li class="TopLi" data-cat="onepiece">원피스</li>
+				</ul>
+			</div>
+
+			<div class="Bottom_Menu"
+				onmouseover="javascript:$('.Bottom_Menu').show()"
+				onmouseout="javascript:$('.Bottom_Menu').hide()">
+				<ul class="top_ul">
+					<li class="TopLi" data-cat="jeans">청바지</li>
+					<li class="TopLi" data-cat="cotton">면바지</li>
+					<li class="TopLi" data-cat="half">반바지</li>
+					<li class="TopLi" data-cat="skirt">치마</li>
+				</ul>
+			</div>
+			<div class="Etc_Menu" onmouseover="javascript:$('.Etc_Menu').show()"
+				onmouseout="javascript:$('.Etc_Menu').hide()">
+				<ul class="top_ul">
+					<li class="TopLi" data-cat="shoes">신발</li>
+					<li class="TopLi" data-cat="hat">모자</li>
+					<li class="TopLi" data-cat="watch">손목시계</li>
+					<li class="TopLi" data-cat="wallet">지갑</li>
+					<li class="TopLi" data-cat="belt">벨트</li>
+					<li class="TopLi" data-cat="glasses">안경</li>
+					<li class="TopLi" data-cat="bag">가방</li>
+				</ul>
+			</div>
+		</div>
+		<div id="overlay_t"></div>
+
+		<div class="container" style="margin-top: 20px;"
+			layout:fragment="container"></div>
+	</div>
+	<div id="footer" style="margin-top: 20px;">
+		<div class="footerTop"
+			style="border-bottom: 1px solid #e1e1e1; border-top: 1px solid #e1e1e1; height: 51px; width: 100%;">
+			
+		</div>
+		<div class="footerInner"
+			style="width: 1100px; margin: 0 auto; margin-top: 20px; margin-bottom: 30px; font-size: 13px; color: #9a9a9a; font-weight: 100; line-height: 150%;">
+			<br> <span style="color: #000; font-weight: bold;">주소 :
+				비트캠프 7층 3강의실 (주)Out Of Stock(OOS) 관리자 및 공동지분자 : 조성익, 정영준, 김진솔, 이호중 </span><br>개인정보
+			관리책임자 : 조성익, 정영준, 김진솔, 이호중 <br> 사업자등록번호 : 123-45-678910 통신판매업 신고
+			: 제2015-서울종로-0111호<br> (주)Out of Stock(OOS)는 통신판매 중개자로서 신상마켓의
+			거래당사자가 아니며, 입점판매자가 등록한 상품정보 및 입점판매자와의 직접 거래에 대해 일체 책임을 지지 않습니다. <br>
+			<br> <span style="color: #000; font-weight: bold;">대표전화 :
+				02-1234-5678</span><br> dailyillusion@naver.com (결제, 환불, 인증 등과 관련된 문의는
+			카카오톡 OOS 고객센터로 문의해주세요)<br> AM 09:30 - PM 06:00 (*토, 일, 공휴일 휴무)<br>
+			<span style="font-weight: bold;">©2018.12 illusion. All right
+				reseved.</span>
+
+		</div>
+	</div>
+
+	<form id="fakeForm">
+		<input type='hidden' id='category_' value='select1'>
+	</form>
+	<form id="actionForm">
+
+		<input type='hidden' name='pageNum' value='1' />
+	</form>
+	<script src="/js/bootstrap.min.js" type="text/javascript"></script>
+	<script src="/js/function.js" type="text/javascript"></script>
+	<script src="/js/menuhover.js" type="text/javascript"></script>
+	<th:block script layout:fragment="script">
+		<script th:inline="javascript">
+			
+		</script>
+	</th:block>
+</body>
+
+</html>

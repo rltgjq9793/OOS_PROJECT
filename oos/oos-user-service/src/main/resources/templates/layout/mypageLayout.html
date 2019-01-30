@@ -1,0 +1,56 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/shopLayout}">
+
+<div layout:fragment="container">
+	<div class="myPageContentArea" style="position: relative; width:100px;">
+		<div class="myPageLeftMenu"
+			style="width: 160px; margin-left: 20px; margin-top:50px; height: 315px;">
+			<div class="" style="width: 100%; height: 65px;">
+				<div class=""
+					style="font-size: 32px; color: #333; line-height: 1.0;">마이페이지</div>
+				<div style="font-size: 20px; color: #9b9b9b; margin-top: 10px;">MYPAGE</div>
+			</div>
+
+			<div class="displayTable"
+				style="width: 100%; height: 30px; margin-top: 30px;">
+				<div class="table-cell myPageMenuClass" style="">
+					<a class="myPageMenuA tradeList" onclick="myPageMove(1)">내 정보
+						수정</a>
+				</div>
+			</div>
+			<div class="displayTable" style="width: 100%; height: 60px;">
+				<div class="table-cell myPageMenuClass" style="">
+					<a class="myPageMenuA orderSheetList" onclick="myPageMove(2)">주문내역</a>
+				</div>
+			</div>
+
+			<div class="displayTable"
+				style="width: 100%; height: 30px; color: #444; font-size: 14px;">
+				<div class="table-cell myPageOrderList" style="">내가 쓴 글</div>
+			</div>
+			<div class="displayTable" style="width: 100%; height: 30px;">
+				<div class="table-cell" style="text-indent: 20px;">
+					<a class="myPageOrderListInner orderList" onclick="myPageMove(3)">REVIEW</a>
+				</div>
+			</div>
+			<div class="displayTable" style="width: 100%; height: 30px;">
+				<div class="table-cell" style="text-indent: 20px;">
+					<a class="myPageOrderListInner dOrderList" onclick="myPageMove(4)">QNA</a>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	
+	<div layout:fragment="Mcontainer">
+	</div>	
+</div>
+
+<th:block layout:fragment="script">
+	<script th:inline="javascript">
+		
+	</script>
+</th:block>
+</html>
+

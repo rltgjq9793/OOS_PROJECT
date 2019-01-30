@@ -1,0 +1,669 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/shopLayout}">
+
+
+<style>
+.inner_main_img img {
+	width: 540px;
+	height: 80px;
+}
+
+.gthumb img {
+	width: 40px;
+	height: 10px;
+}
+</style>
+<div class="container" style="margin-top: 20px;"
+	layout:fragment="container">
+
+	<div class="innerDetail_goods_info" style="padding-bottom: 50px;">
+		<div class="img_area"
+			style="border-right: 1px solid rgb(221, 221, 221);">
+			<div id="gthumbs" class="gthumbs" style=" height:720px;overflow-y: auto;">
+
+			</div>
+			<div style="position: relative; width: 540px;float:right; height:720px;line-height:200px;">
+				<img style="width:100%;position:absolute;
+									top:0;bottom:0;margin:auto;"
+					class="inner_main_img" src="">
+			</div>
+			<div id="innerDetail_goods_detail" class="goods_detail">
+				<div class="div_line_1px" style="width: 632px; margin-right: 20px;"></div>
+				<div class="goods_detail_title displayTable">
+					<div class="table-cell">제품 상세설명</div>
+				</div>
+				<div class="goods_detail_text" th:text="${product.content}"></div>
+				
+				<div class="area_title_detail">
+					<h3 class="title_detail">
+						<em class="anchor" id="revw"></em>상품리뷰
+					</h3>
+
+					<p class="text_introduction">
+						평균평점 : <span class="average"></span>
+					</p>
+				</div>
+				<div class="goods_comments_area">
+					<div class="detail_tab_floatable">
+						<em class="anchor" id="dts"></em>
+						<ul class="tab_floatable" role="tab" id="replySelector">
+							<li class="item" role="none" data-kind='R'><a class="link2">리뷰
+									<span class="count" th:text="${product.ReviewReplyCnt}">COUNT</span>
+							</a></li>
+							<li class="item" role="none" data-kind="Q"><a class="link">Q&amp;A
+									<span class="count" th:text="${product.QuestionReplyCnt}">COUNT</span>
+							</a></li>
+						</ul>
+					</div>
+
+					<div id="replyAdd" class="replyContainer">
+						<div>
+							<input type="text" name="title" class="replytitlearea"
+								style="width: 94%; padding: 0 10px; height: 30px; margin-bottom: 15px; border: 1px solid #e3e3e3"
+								placeholder="제목을 입력해주세요.">
+						</div>
+
+						<div class="goods_comment_input"
+							style="position: relative; box-sizing: border-box; border: 1px solid #e3e3e3; width: 98%; height: 110px;">
+							<input id="innerCommentMsg" name="content" class="replyTextarea"
+								placeholder="덧글을 입력해주세요." style="width: 100%; height: 80px;">
+							<div class="star">
+								<select class="score" id="score"
+									style="border: 0px; height: 28px;">
+									<option th:value="5" selected>★★★★★</option>
+									<option th:value="4">★★★★</option>
+									<option th:value="3">★★★</option>
+									<option th:value="2">★★</option>
+									<option th:value="1">★</option>
+								</select>
+							</div>
+							<button class="repleRegiBtn">등록하기</button>
+						</div>
+					</div>
+
+					<ul id="inner_goods_comments" class="inner_goods_comments"
+						style="position: relative;">
+
+					</ul>
+					<div class="replyPageFooter" style="text-align: center;"></div>
+
+				</div>
+			</div>
+		</div>
+		<div class="info_area">
+			<div class="info_area_inner"
+				style="margin-left: 18px; position: relative;">
+				<div class="more_goods">
+					<div class="goods_name" th:text="${product.pname}">PNAME</div>
+					<div class="detail_store_name">
+						<a th:href="|/store/list?sno=${product.store.sno}|"><span class="store" th:text="${product.store.sname}">SNAME</span></a> / <span
+							th:text="${product.store.tel}">TEL</span>
+					</div>
+					<div class="goods_price" th:text="${product.price}">PRICE</div>
+					<div class="div_line_1px" style="width: 100%; margin-bottom: 30px;"></div>
+					
+					<table class="goods_option_table" style="margin-bottom: 30px;">
+						<tbody>
+							<tr>
+								<td class="title" style="color: #ff7675;">신상배송</td>
+								<td class="content">카카오 결제만 가능, 택배배송<span
+									style="color: #b0b0b0;">(우체국택배)</span></td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="div_line_1px" style="width: 100%; margin-bottom: 21px;"></div>
+					<div class="option_area">
+						<ul class="goods_option_ul" style="width: 100%;"
+							th:each="arr:${product.optList}">
+							<li class="min-height42 optionLi">
+								<div class="option">
+									<div th:name="${arr.opno}" th:data-size="${arr.size}"
+										style="color: #333; font-weight: 500; font-size: 14px;"
+										th:text="${arr.size}">OPTION</div>
+									<div style="margin-top: 6px; font-size: 12px;"
+										th:text="|재고수량 / ${arr.qty}|">QTY</div>
+								</div>
+								<div class="count">
+									<div class="option_count_control" style="">
+										<div class="detailUpDownDiv">
+											<div class="detailDownArea"></div>
+											<input name="option" th:id="${arr.opno}"
+												class="detailUpDownNumArea" type="text" value="0">
+											<div class="detailUpArea"></div>
+										</div>
+									</div>
+								</div>
+							</li>
+						</ul>
+						<div class="div_line_1px"
+							style="width: 100%; margin-top: 20px; margin-bottom: 15px;"></div>
+					</div>
+
+					<input type="hidden" name="pno" th:value="${product.pno}">
+
+					<div class="displayTable"
+						style="width: 100%; background-color: #ffefef; height: 50px; padding: 0px 16px; box-sizing: border-box; margin-bottom: 15px;">
+						<div id="selectResult" class="table-cell"></div>
+						<div class="table-cell" style="font-size: 14px;">총 결제금액</div>
+						<div class="detailOrderPrice table-cell"
+							style="text-align: right; font-size: 20px; color: #ff5252; font-weight: 500;">
+							<span class="totalSum">0</span>원
+						</div>
+					</div>
+
+					<div class="btn_area">
+						<div style="position: relative">
+							<div class="basketInfoTextBox basketMoveBox"
+								style="position: absolute; left: 111px; top: -106px; width: 318px; height: 100px; z-index: 3; display: none">
+								<div class="close_btn" style="position: absolute; right: 8px; top: 8px;"></div>
+								<div
+									style="text-align: center; font-size: 14px; margin-top: 16px; font-weight: bold; letter-spacing: -0.4px;">
+									장바구니에 상품이 담겼습니다.<br>
+									<button class="basketMoveBtn" onclick="goShoppingBasket()"
+										style="margin-top: 14px; height: 38px; cursor: pointer;">
+										장바구니 바로가기 <span class="btn_css_arrow"></span>
+									</button>
+								</div>
+							</div>
+							
+							<div class="inner_btn_zzim" th:id="${product.sno}" 
+							style="display:inline-block; margin-right:10px; margin-bottom:8px;"></div>
+							<button class="btn_order" style="display: inline-block;">장바구니에 담기</button>
+						</div>
+						<button th:if="${#strings.toString(product.state)}=='O'" 
+							class="btn_order_direct" style="display: inline-block;">
+							<div class="symbolLogo"></div>
+							주문하기
+						</button>
+						<div th:if="${#strings.toString(product.state)}=='X'" >
+							<h1>판매가 중지된 상품입니다.</h1>
+						</div>
+					</div>
+
+				</div>
+				<div class="div_line_1px"></div>
+				<div class="mgoods_images"></div>
+			</div>
+		</div>
+	</div>
+	<span id="secName" sec:authentication="name" style="display:none"></span>
+	<form action="/order/list" id="storeDetailForm" method="get">
+		<input type="hidden" name="mid" id="mid">
+	</form>
+</div>
+
+<th:block layout:fragment="script">
+	<script th:inline="javascript" th:src="@{/js/reply.js}"></script>
+	<script th:inline="javascript">
+	$(document).ready(function() {
+		var storeDetailForm = $("#storeDetailForm");
+	    var product = [[${product}]];
+	    var pno = [[${product.pno}]];
+	    var sno = [[${product.sno}]];
+	    var img = [[${img}]];
+	    var pageNum = 1;
+		var replyPageFooter = $(".replyPageFooter");
+		
+		var pnoValue =  [[${product.pno}]];
+		var replyUL = $("#inner_goods_comments");
+		var kindValue = "R"; 
+		var parent = 0;
+		
+		var replyAdd = $("#replyAdd");
+		var InputTitle = replyAdd.find("input[name='title']");
+		var InputContent=replyAdd.find("input[name='content']");
+		var InputMid=replyAdd.find("input[name='mid']");
+		
+		var replyContainer =$(".replyContainer").clone(true);
+		var modifyTitle ;
+		var modifyContent;
+		var modifyMid;
+		var modifyRno;
+		var modifyScore;
+		
+		var scoreValue = $("#score option:selected").val();
+	
+		(function() {
+			if($("#secName").html() != "anonymousUser"){
+				$("#mid").val($("#secName").html());
+				mid = $("#secName").html();
+			}
+			showList(1);
+			setImg();
+			
+			if(mid != undefined){
+				$.ajax({
+					type:"post",
+					url:"/store/checkzzim/"+sno,
+			        success:function(result,status,xhr){
+						if(result == "yes"){
+							$(".inner_btn_zzim").addClass("on");
+						}else if(result == "no"){
+							$(".inner_btn_zzim").removeClass("on");						
+						}
+					},
+				});
+			}
+		})();
+		
+		function setImg(){
+			
+			 var imgList=[[${product.imgList}]];
+			var str="";
+			var fileCallPath =  encodeURIComponent(imgList[0].ipath+ "/"+ imgList[0].uuid +"_"+imgList[0].iname);
+			 $(".inner_main_img").attr("src","/display?fileName="+fileCallPath); 
+			
+		
+			 $.each(imgList, function(index, item){
+				if(item.pno == product.pno){
+					$(".inner_main_img").attr("src",item.img);
+				} 
+			});  
+			
+			 for(img of imgList){
+				
+				var thumbFileCallPath =  encodeURIComponent(img.ipath+ "/"+ img.uuid +"_"+img.iname);
+
+				str += "<div class='gthumb'>"
+				str += "<img width='60' src='/display?fileName="+
+						thumbFileCallPath+"' style='display:block;'>"
+				str += "<span class='img_edge'></span></div>"
+		
+			}
+			
+			$(".gthumbs").html(str); 
+		}
+		
+		//장바구니
+		$(".btn_order").on('click',function(e){
+			e.preventDefault();
+			
+			if(mid == undefined){
+				alert("로그인 해주세요.")
+				return;
+			}
+			
+			 var jsonList = new Array();
+			$.each($(".detailUpDownNumArea"), function(index, item){
+				if($(this).val() !=0){
+					var list = {
+							"mid" : mid,
+							"pno" : pno,
+							"qty" : $(this).val(),
+							"opno" : $(this).attr("id"),
+							"sno" : sno
+					}
+					
+					jsonList.push(list);
+				}
+				
+			}); 
+
+			if(jsonList.length != 0){
+				$.ajax({
+	                type:"post",
+	                data : JSON.stringify(jsonList),
+	                url: "/cart/new",
+	                contentType : "application/json; charset=UTF-8",
+	                success:function(result, status, xhr){
+	                	console.log(result);
+	    			}
+		         }); 
+				 
+			 $(".basketInfoTextBox").css("display", "block");
+					 
+			}else{
+				alert("수량을 입력해주세요.")
+			} 
+			
+		});
+		
+		$(".detailDownArea").click(function(e) {
+			var count = $(this).next("input").val();
+			if (count > 0) {
+				count -= 1;
+				$(this).next("input").val(count);
+			} else {
+				$('html').css({
+					'cursor' : 'url(cursor.png), auto'
+				});
+			}
+			totalSum();
+		})
+
+		$(".detailUpArea").click(function(e) {
+
+			var count = Number($(this).prev("input").val());
+			count += 1;
+			$(this).prev("input").val(count);
+			totalSum();
+		})
+
+		
+		
+		$("#gthumbs").on("mouseover",".gthumb",function(e) {
+			console.log("hello");
+			$(this).find("span").attr("class", "hover");
+			var src = $(this).find("img").attr("src");
+			$(".inner_main_img").attr("src", src);
+		}).mouseout(function() {
+			$(this).find("span").attr("class", "img_edge");
+			setImg();
+		})
+
+		$(".close_btn").click(function(e) {
+			$(".basketInfoTextBox").css("display", "none")
+		});
+		
+		$(".inner_btn_zzim").click(function(){
+			if(mid == null){
+				alert("로그인 후 이용할 수 있습니다.");
+				return;
+			}
+			
+			$.ajax({
+				type:"post",
+				url:"/user/zzim/"+sno,
+		        success:function(result,status,xhr){
+					if(result == "insert"){
+						$(".inner_btn_zzim").addClass("on");
+					}else if(result == "delete"){
+						$(".inner_btn_zzim").removeClass("on");						
+					}
+				},
+			});
+		});
+		
+		$(".btn_order_direct").click(function(){
+			
+			if(mid == undefined){
+				alert("회원만 주문가능합니다.")
+				return;
+			}
+			
+			$.each(product.optList, function(index, item){
+				var value = $("#"+item.opno+"").val();
+				if(value > 0){
+					storeDetailForm.append("<input type='hidden' name='info' id='info' value='"
+							+pno+"_"+item.opno+"_"+value+"_"+sno+"'>")
+							.append("<input type='hidden' name='"+csrfName+"' value='"+token+"' >");
+					
+				}
+			});
+			if($("#info").val() == null){
+				alert("수량을 입력해 주세요");
+			}else{
+				storeDetailForm.attr("method","post").submit();
+			}
+			
+		});
+		
+		$(".detailUpDownNumArea").change(function(){
+			totalSum();
+		});
+		
+		function totalSum(){
+			var totalSum = 0;
+			$(".detailUpDownNumArea").each(function(index, item){
+				totalSum += Number(product.price * item.value);
+			});
+			
+			$(".totalSum").html(totalSum);
+		}
+		
+
+		//Question 별점숨김.
+		$(".goods_comments_area").on("click","div [data-kind]",function(e){
+			
+			var kind=$(this).data("kind");
+			
+			if(kind =='Q'){
+				$(".star").hide();
+			}
+			else{
+				$(".star").show();	
+			}
+			
+			$(".item").find("a").attr("class","link");
+			$(this).find("a").attr("class","link2");
+			
+			var kind=$(this).data("kind");
+			kindValue=kind;
+			showList(1);
+			
+		});
+		
+		//댓글페이지 출력
+		function showReplyPage(replyCnt){
+			
+			var endNum = Math.ceil(pageNum/10.0)*10;
+			var startNum = endNum - 9;
+			
+			var prev = startNum != 1;
+			var next = false;
+			
+			if(endNum*10>=replyCnt){
+				endNum=Math.ceil(replyCnt/10.0);
+			}
+						
+			if(endNum*10 <replyCnt){
+				next=true;				
+			}
+			
+			var str="<div style='text-align:center;''>";
+			
+			if(prev){
+				str+="<div class='pageControlLeft'><button href='"+(startNum-1)+"'></button></div>";
+			}
+			
+			for(var i=startNum; i<=endNum; i++){
+				var active= pageNum ==i?"active":"";
+				
+				str+="<div class='showPage'style='display:inline-block; vertical-align:top;'>";
+				str+="<button class='pageNum pageNumber "+active+"' href='"+i+"'>"+i+"</button>";
+				
+			}
+			
+			if(next){
+				str+="<div class='pageControlRight'><a href='"+(endNum-1)+"'></a></div>";
+			}
+			str+="</div>";
+			replyPageFooter.html(str);
+		}
+		
+		replyPageFooter.on("click","button",function(e){
+			
+			e.preventDefault();
+			var targetPageNum = $(this).attr("href");
+			
+			pageNum=targetPageNum;
+			
+			showList(pageNum);
+		});
+		
+		//get
+		$(".inner_goods_comments").on("click",".modifyBtn",function(e){
+			
+			var kind = kindValue;
+			
+		 	 modifyTitle = replyContainer.find("input[name='title']");
+			 modifyContent=replyContainer.find("input[name='content']");
+			 modifyMid=replyContainer.find("input[name='mid']");
+			 modifyScore=replyContainer.find(".score option:selected").parent();
+			 
+			modifyRno=$(this).data("rno");
+			
+			$(this).parent().parent().parent().append(replyContainer.show());
+			
+		 	if(kind == 'Q'){
+				replyContainer.find(".star").hide();	
+			} 
+			
+			replyService.get(modifyRno,function(reply){
+				
+				modifyTitle.val(reply.title);
+				modifyContent.val(reply.content);
+				modifyMid.val(reply.mid).attr("readonly","readonly");
+				modifyScore.val(reply.score);
+				replyContainer.find('button').text("수정하기").attr("class","repleRegiBtn modBtn");
+			});
+							
+		});
+		
+		//수정 replyContainer
+		    $(document).on("click",".modBtn",function(e){
+		    	
+		    if(kindValue == "Q"){
+				scoreValue = 0;
+			}else if(kindValue == "R"){
+				scoreValue = $(this).parent().parent().parent().find("select option:selected").val();
+			}
+		    	
+			var reply ={
+					rno : modifyRno,
+					title:modifyTitle.val(),
+					content:modifyContent.val(),
+					kind:kindValue,
+					score: scoreValue
+			};
+			
+			replyService.update(reply,function(result){
+				showList(pageNum);
+			});
+			
+		});
+		
+		//삭제
+		$(".inner_goods_comments").on("click",".deleteBtn",function(e){
+			
+			var rno = $(this).data("rno");
+		
+			replyService.remove(rno,function(result){
+				alert(result);
+				showList(pageNum);		
+			});
+			
+			var cnt=$("div [data-kind='"+kindValue+"']").find("span ");
+
+			showList(1);
+			cnt.text(parseInt(cnt.text())-1);
+		});
+		
+		//댓글등록
+		$(".repleRegiBtn").on("click",function(e){
+			
+			if(mid == null){
+				alert("회원만 댓글 작성이 가능합니다.");	
+				return;
+			}
+			
+			if(kindValue == "Q"){
+				scoreValue = 0;
+			}else if(kindValue == "R"){
+				scoreValue = $("#score option:selected").val();
+			}
+			
+			if($(".replyTextarea").val() == "" || $(".replytitlearea").val() == ""){
+				alert("덧글을 입력해주세요");	
+				return;
+			}
+			
+			var reply ={					
+					pno:pnoValue,
+					mid: mid,
+					content: InputContent.val(),
+					title: InputTitle.val(),
+					kind: kindValue,
+					score: scoreValue,
+					parent: ++parent,
+					depth:0				
+					};
+			
+			replyService.add(reply, function(result){
+				alert(result);
+				replyAdd.find("input").val("");
+				
+				var cnt=$("div [data-kind='"+kindValue+"']").find("span ");
+				showList(1);
+				cnt.text(parseInt(cnt.text())+1);
+								
+			}); 
+		});
+
+		
+		function formatDate(date) {
+		    var d = new Date(date),
+		        month = '' + (d.getMonth() + 1),
+		        day = '' + d.getDate(),
+		        year = d.getFullYear();
+
+		    if (month.length < 2) month = '0' + month;
+		    if (day.length < 2) day = '0' + day;
+
+		    return [year, month, day].join('-');
+		}
+		
+		//리스트
+		function showList(pageNum){
+			
+			replyService.getList({pno:pnoValue, page:pageNum, kind:kindValue}, 
+					function(replyCnt,parentCnt,list,scoreAverage){
+				
+				$(".average").text(scoreAverage.toFixed(2));
+				
+				if(pageNum == -1){
+					pageNum= Math.ceil(replyCnt/10.0);
+					showList(pageNum);
+					return;
+				}
+				var str ="";
+				if(list == null || list.length == 0){
+					replyUL.html("");
+					return;
+				}
+				
+				for(var i=0, len = list.length ||0; i<len; i++){
+					if(list[i].mid == null){
+						str +="<div data-rno='"+list[i].rno+"' style='padding-left:40px; background:#fafafa' class='item_review'>";
+					}else{
+						str +="<div data-rno='"+list[i].rno+"' class='item_review'>";
+					}
+					str +="<div class='review_profile'><img src='/img/profile.jpg'></div><div><div>";
+					str +="<span class='title' style='margin-top: 17px; padding: 15px;'>";
+					if(list[i].title !== "null"){
+						str += "<strong>"+list[i].title+"</strong></span>";
+					}else{
+						str += "<strong>판매자</strong></span>";
+					}
+					
+					if(list[i].kind =="Q" || list[i].title == "null"){
+						str+="</div><div>";
+					}else{
+						str +="<span class='score'><img src ='/img/"+list[i].score+"star.png' width='80px'/></span></div><div>";
+					}
+					
+					if(list[i].depth==1){
+						str+="<div class='area_status_user'>";
+					}else{
+						str+="<div class='area_status_user'><span class='text_info'>"+list[i].mid + " /</span>";
+					}					
+					str +=" <span class='text_info'>"+formatDate(list[i].regdate)+"</span>";
+					if(list[i].mid != null && mid == list[i].mid){
+						str +="/<span class='text_info infoBtn modifyBtn' data-rno='"+list[i].rno+"'>수정</span>";
+						str +="<span class='text_info infoBtn deleteBtn' data-rno='"+list[i].rno+"'>삭제</span>";
+					}
+					str +="</div></div><p style='margin-left:45px;'>"+list[i].content+" </p></div></div>";
+				
+				}	replyUL.html(str);
+				parent = parentCnt;
+				showReplyPage(replyCnt);
+				
+			});
+		}
+		
+	});
+</script>
+</th:block>
+
+</html>

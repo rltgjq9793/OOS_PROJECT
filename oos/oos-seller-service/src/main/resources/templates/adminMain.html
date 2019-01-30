@@ -1,0 +1,309 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/sellerLayout}">
+
+<div class="container" style="margin-top: 20px;"
+	layout:fragment="container">
+<style>
+.donut{
+	float:left;
+	width:150px;
+		height:20vh;
+	
+}
+
+</style>
+
+	<div class="row">
+	
+		<div class="col-lg-6 col-md-12">
+			<div class="panel panel-green">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-3">
+							<i class="fa fa-krw fa-5x"></i> 
+						</div>
+						<div class="col-xs-9 text-right">
+							<div class="huge">[[${todayRevenue}]]원</div>
+							<div>Today Revenue</div>
+						</div>
+					</div>
+				</div>
+				<a href="#">
+					<div class="panel-footer">
+						<span class="pull-left">View Details</span> <span
+							class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+						<div class="clearfix"></div>
+					</div>
+				</a>
+			</div>
+		</div>
+		
+			<div class="col-lg-6 col-md-12">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-3">
+							<i class="fa fa-krw fa-5x"></i> 
+						</div>
+						<div class="col-xs-9 text-right">
+							<div class="huge">[[${monthlyRevenue}]]원</div>
+							<div>Monthly Revenue</div>
+						</div>
+					</div>
+				</div>
+				<a href="#">
+					<div class="panel-footer">
+						<span class="pull-left">View Details</span> <span
+							class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+						<div class="clearfix"></div>
+					</div>
+				</a>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-6">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-3">
+							<i class="fa fa-users fa-5x"></i>
+						</div>
+						<div class="col-xs-9 text-right">
+							<div class="huge">[[${totalVisit}]]명</div>
+							<div>총방문자</div>
+						</div>
+					</div>
+				</div>
+				<a href="#">
+					<div class="panel-footer">
+						<span class="pull-left">View Details</span> <span
+							class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+						<div class="clearfix"></div>
+					</div>
+				</a>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-6">
+			<div class="panel panel-yellow">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-3">
+							<i class="fa fa-users fa-5x"></i>
+						</div>
+						<div class="col-xs-9 text-right">
+							<div class="huge">[[${totalCustomer}]]명</div>
+							<div>총 회원수(고객)</div>
+						</div>
+					</div>
+				</div>
+				<a href="#">
+					<div class="panel-footer">
+						<span class="pull-left">View Details</span> <span
+							class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+						<div class="clearfix"></div>
+					</div>
+				</a>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-6">
+			<div class="panel panel-green">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-3">
+							<i class="fa fa-user fa-5x"></i>
+						</div>
+						<div class="col-xs-9 text-right">
+							<div class="huge">[[${newCustomer}]]명</div>
+							<div>새 고객</div>
+						</div>
+					</div>
+				</div>
+				<a href="#">
+					<div class="panel-footer">
+						<span class="pull-left">View Details</span> <span
+							class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+						<div class="clearfix"></div>
+					</div>
+				</a>
+			</div>
+		</div>
+		
+		
+		
+		<div class="col-lg-3 col-md-6">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-3">
+							<i class="fa fa-cube fa-5x"></i>
+						</div>
+						<div class="col-xs-9 text-right">
+							<div class="huge">[[${totalProduct}]]개</div>
+							<div>판매중인 상품</div>
+						</div>
+					</div>
+				</div>
+				<a href="#">
+					<div class="panel-footer">
+						<span class="pull-left">View Details</span> <span
+							class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+						<div class="clearfix"></div>
+					</div>
+				</a>
+			</div>
+		</div>
+		
+		<div class="col-lg-3 col-md-6">
+			<div class="panel panel-green">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-3">
+							<i class="fa fa-smile-o fa-5x"></i>
+						</div>
+						<div class="col-xs-9 text-right">
+							<div class="huge">[[${currentSeller}]]명</div>
+							<div>현재 판매자</div>
+						</div>
+					</div>
+				</div>
+				<a href="#">
+					<div class="panel-footer">
+						<span class="pull-left">View Details</span> <span
+							class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+						<div class="clearfix"></div>
+					</div>
+				</a>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-6">
+			<div class="panel panel-yellow">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-3">
+							<i class="fa fa-meh-o fa-5x"></i>
+						</div>
+						<div class="col-xs-9 text-right">
+							<div class="huge">[[${unapprovedSeller}]]명</div>
+							<div>미승인 판매자</div>
+						</div>
+					</div>
+				</div>
+				<a href="#">
+					<div class="panel-footer">
+						<span class="pull-left">View Details</span> <span
+							class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+						<div class="clearfix"></div>
+					</div>
+				</a>
+			</div>
+		</div>				
+		<div class="col-lg-3 col-md-6">
+			<div class="panel panel-red">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-3">
+							<i class="fa fa-frown-o fa-5x"></i>
+						</div>
+						<div class="col-xs-9 text-right">
+							<div class="huge">[[${banCount}]]명</div>
+							<div>정지중인 판매자</div>
+						</div>
+					</div>
+				</div>
+				<a href="#">
+					<div class="panel-footer">
+						<span class="pull-left">View Details</span> <span
+							class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+						<div class="clearfix"></div>
+					</div>
+				</a>
+			</div>
+		</div>
+		
+		
+		<div class="col-lg-3 col-md-6">
+			<div class="panel panel-red">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-3">
+							<i class="fa fa-male fa-5x"></i>
+						</div>
+						<div class="col-xs-9 text-right">
+							<div class="huge">[[${banCustomer}]]명</div>
+							<div>정지 회원</div>
+						</div>
+					</div>
+				</div>
+				<a href="#">
+					<div class="panel-footer">
+						<span class="pull-left">View Details</span> <span
+							class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+						<div class="clearfix"></div>
+					</div>
+				</a>
+			</div>
+		</div>
+		
+		
+		
+		 <div class="col-lg-12">
+		      <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-star-o fa-fw"></i> SNS 관리
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="list-group">
+        
+                                <a href="#" class="list-group-item">
+                                    <i class="fa  fa-instagram fa-fw"></i> OOS instagram
+                                    <span class="pull-middle">
+                                    </span>
+                                </a>
+                                
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-facebook fa-fw"></i> OOS facebook
+                                    <span class="pull-middle">
+                                    </span>
+                                </a>
+                                
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-twitter fa-fw"></i> OOS twitter
+                                    <span class="pull-middle">
+                                    </span>
+                                </a>
+                                
+                                <a href="#" class="list-group-item">
+                                    <i class="fa  fa-wechat fa-fw"></i> OOS KakaoTalk
+                                    <span class="pull-middle">
+                                    </span>
+                                </a>
+                                
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-youtube fa-fw"></i> OOS youtube
+                                    <span class="pull-middle">
+                                    </span>
+                                </a>
+                                
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-envelope-o fa-fw"></i> OOS mail
+                                    <span class="pull-middle">
+                                    </span>
+                                </a>
+                            </div>
+                            
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->    
+				</div>
+		</div>
+</div>
+<th:block layout:fragment="script">
+	<script th:inline="javascript">
+$(document).ready(function(e){
+	
+});
+</script>
+</th:block>
+</html>

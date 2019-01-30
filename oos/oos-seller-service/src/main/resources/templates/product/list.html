@@ -1,0 +1,131 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/sellerLayout}">
+
+<div class="container" style="margin-top: 20px;"
+	layout:fragment="container">
+
+	<div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">판매중인상품</h1>
+		</div>
+		<!-- /.col-lg-12 -->
+	</div>
+	<!-- /.row -->
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="panel-body">
+				<div class="table-responsive">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>상품번호</th>
+								<th>상품명</th>
+								<th>가격</th>
+								<th>상태</th>
+								<th>등록일</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="product:${product}">
+								<td>
+									<div>
+										<img th:class="|thumb_${product.pno}|"
+											style="width: 60px; display: inline-block; vertical-align: middle;">
+									</div>
+								</td>
+								<td th:text="${product.pno}"></td>
+								<td><a class="move" th:href="${product.pno}"
+									th:text="${product.pname}"></a></td>
+								<td th:text="${product.price}"></td>
+								<td th:if="${#strings.toString(product.state)}=='O'"
+								style="color:blue">판매</td>
+								<td th:if="${#strings.toString(product.state)}=='X'"
+								style="color:lightred">판매중지</td>
+								<td th:text="${product.regdate}"></td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="pull-right">
+						<ul class="pagination">
+
+							<li class="paginate_button previous"
+								th:if="${pageMaker.prev} == true"></li>
+
+							<li class="paginate_button" th:id="${page}"
+								style="display: inline-block; vertical-align: top;"
+								th:each="page : ${pageList}">
+								<button class="paginate_button" th:id="${page}"
+									th:text="${page}">1</button>
+							</li>
+							<li class="paginate_button" th:if="${pageMaker.next} == true"></li>
+						</ul>
+					</div>
+
+				</div>
+				<!-- /.table-responsive -->
+			</div>
+		</div>
+	</div>
+	<!-- /#page-wrapper -->
+	<form id="actionForm" action="/product/list">
+		<input type='hidden' name='amount' th:value='${pageMaker.cri.amount}' />
+		<input type='hidden' id="pageNum" name='pageNum' th:value='${pageMaker.cri.pageNum}' />
+	</form>
+</div>
+
+
+<th:block layout:fragment="script">
+<script th:inline="javascript">
+
+$(document).ready(function(){
+	
+	var actionForm = $("#actionForm");
+	var pageMaker = [[${pageMaker}]];
+	var product = [[${product}]];
+	
+	(function(){
+		
+		$.each(product, function(index, item){
+			var img = item.imgList[0];
+						
+			var fileCallPath =  encodeURIComponent(img.ipath+ "/s_"+ img.uuid +"_"+img.iname);
+			console.log(item.pno);
+		 	 $.each($('.thumb_'+ item.pno),function(){
+		 		 console.log("item");
+				$(this).attr("src","/display?fileName="+fileCallPath); 
+			});	
+		});
+	})();
+	
+	
+	$(".move").on("click",function(e){
+		
+		console.log("click...");
+		e.preventDefault();
+		actionForm.append("<input type='hidden' name='pno' value='"+$(this).attr("href")+"' >");
+		actionForm.attr("action","/product/read");
+		actionForm.submit();
+	});
+	
+	$(".paginate_button").click(function(e) {
+		
+		 $("#pageNum").val($(this).attr("id"));
+		actionForm.submit();
+	});
+	
+	$(".paginate_button previous").click(function(){
+		$("#pageNum").val(Number(pageMaker.startPage) -1);
+		actionForm.submit();
+	});
+	
+	$(".paginate_button next").click(function(){
+		$("#pageNum").val(Number(pageMaker.endPage) + 1);
+		actionForm.submit();
+	});
+	
+});	 
+		
+</script>
+</th:block>

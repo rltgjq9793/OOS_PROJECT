@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.oos.mapper.ProductMapper">
+	<resultMap type="org.oos.domain.CategoryVO" id="Category">
+		<result column="cateno" property="cateno" />
+		<result column="catename" property="catename" />
+	</resultMap>
+	<resultMap type="org.oos.domain.ProductOptionVO" id="Option">
+		<result column="opno" property="opno" />
+		<result column="size" property="size" />
+		<result column="qty" property="qty" />
+	</resultMap>
+	<resultMap type="org.oos.domain.ProductImgVO" id="Image">
+		<result column="uuid" property="uuid" />
+		<result column="pno" property="pno" />
+		<result column="iname" property="iname" />
+		<result column="ipath" property="ipath" />
+	</resultMap>
+	<resultMap type="org.oos.domain.StoreVO" id="Store">
+		<result column="sno" property="sno" />
+		<result column="sname" property="sname" />
+		<result column="saddress" property="saddress" />
+		<result column="tel" property="tel" />
+		<collection property="imgList" resultMap="Image" />
+	</resultMap>
+	<resultMap type="org.oos.domain.HashTagVO" id="Tag">
+		<result column="hno" property="hno" />
+		<result column="tag" property="tag" />
+		<result column="tagcnt" property="tagcnt" />
+		<result column="del" property="del" />
+	</resultMap>
+
+	<resultMap type="org.oos.domain.ProductVO" id="Product">
+		<result column="pno" property="pno" />
+		<result column="pname" property="pname" />
+		<result column="price" property="price" />
+		<result column="sname" property="sname" />
+		<result column="sno" property="sno" />
+		<result column="regdate" property="regdate" />
+		<result column="updatedate" property="updatedate" />
+		<result column="del" property="del" />
+		<result column="state" property="state" />
+		<result column="questionreplycnt" property="questionReplyCnt" />
+		<result column="reviewreplycnt" property="reviewReplyCnt" />
+		<result column="content" property="content" />
+		<collection property="imgList" resultMap="Image" />
+		<collection property="store" resultMap="Store" />
+		<collection property="optList" resultMap="Option" />
+		<collection property="tagList" resultMap="Tag" />
+		<collection property="cateList" resultMap="Category" />
+	</resultMap>
+
+	<update id="upVisitCnt">
+		update tbl_product set visitcnt=visitcnt+1 where pno
+		= #{pno}
+	</update>
+
+	<select id="getByPno" resultMap="Product">
+		select p.pno, p.pname, p.price,
+			s.sno, p.state, tel, p.questionreplycnt, p.reviewreplycnt,
+			p.content,uuid, iname, ipath, o.opno, o.size, o.qty, sname,c.catename
+		from tbl_product p
+			left join
+				 tbl_product_img i
+				on p.pno =i.pno
+			left join
+				tbl_product_option o
+				on p.pno=o.pno
+			left join
+				 tbl_store s
+				on s.sno =p.sno
+			left outer join
+				 tbl_category c
+				on p.pno =c.pno
+		where p.pno > 0 and o.opno
+		> 0 and p.del = 'N'
+		and uuid !=
+		"" and c.cateno>0 and p.pno=#{pno}
+	</select>
+
+
+	<select id="getListBySno" parameterType="map" resultMap="Product">
+		select 
+			* 
+		from 
+			tbl_product p
+			left join 
+				tbl_product_img i
+			on
+			 p.pno = i.pno
+		
+		where
+			 p.del='N' and p.pno > 0 and uuid != "" and
+			p.sno=#{sno}
+		
+		group by i.pno
+		
+		order by p.pno desc
+			limit #{dto.cri.skip}
+			,#{dto.cri.amount}
+	</select>
+
+	<select id="getList2" parameterType="map" resultMap="Product">
+		select * from tbl_product p
+		left join tbl_product_img i
+		on p.pno = i.pno
+		left join tbl_store s
+		on p.sno = s.sno
+		right join tbl_category c
+		on c.pno
+		= p.pno
+		where s.sno > 0 and p.del='N' and p.pno > 0 and c.cateno > 0
+		and uuid != ""
+		<if test="sno != null">
+			and s.sno=#{sno}
+		</if>
+		<if test="seller == null">
+			and p.state='O'
+		</if>
+		<if test="dto != null">
+			<if test="dto.cri.category != null ">
+				and c.catename=#{dto.cri.category}
+			</if>
+			<if test="dto.cri.filter != null">
+				and p.pname like concat("%", #{dto.cri.keyword} ,"%")
+			</if>
+			group by p.pno
+			<choose>
+				<when test="dto.cri.orderby == '1'.toString()">
+					order by p.price desc
+				</when>
+				<when test="dto.cri.orderby == '2'.toString()">
+					order by p.price asc
+				</when>
+				<otherwise>
+					order by p.pno desc
+				</otherwise>
+			</choose>
+			limit #{dto.cri.skip} ,#{dto.cri.amount}
+		</if>
+	</select>
+
+	<select id="bestProductList"
+		resultType="org.oos.domain.ProductVO" resultMap="Product">
+		select d.pno, pname, price, count(*) cnt, uuid, ipath, iname from tbl_order_detail d
+		left join tbl_product p
+		on d.pno = p.pno
+		join(select * from tbl_product_img
+		group by pno) i
+		on i.pno = d.pno
+		where odno > 0 and uuid != "" and p.pno > 0 and d.del = 'N'
+		group by pno
+		order by cnt desc
+		limit 0, 6
+	</select>
+
+	<insert id="insert">
+		insert into tbl_product(pname,price,sno,content)
+		values(#{pname},#{price},#{sno},#{content})
+		<selectKey resultType="Long" keyProperty="pno" order="AFTER">
+			select
+			max(pno) from tbl_product
+		</selectKey>
+	</insert>
+
+	<update id="modify">
+		update tbl_product
+		set
+		pname=#{pname},price=#{price},content=#{content}
+		where pno=#{pno}
+	</update>
+
+	<update id="delete">
+		update tbl_product
+		set del='Y'
+		where pno=${pno}
+	</update>
+
+	<update id="minus">
+		update tbl_product_option
+		set qty = #{qty}
+		where
+		opno=#{opno}
+	</update>
+
+	<update id="resetVisitCnt">
+		update tbl_product set visitcnt=0 where pno >0
+	</update>
+
+	<select id="count" parameterType="map" resultType="int">
+		select count(*)
+		from tbl_product p
+		left join tbl_store s
+		on p.sno = s.sno
+		right join tbl_category c
+		on c.pno = p.pno
+		where p.pno > 0
+		<if test="sno != null">
+			and s.sno=#{sno}
+		</if>
+		<if test="seller == null">
+			and p.state='O'
+		</if>
+		<if test="cri != null and cri.category != null ">
+			and c.catename=#{cri.category}
+		</if>
+		<if test="cri != null and cri.filter != null">
+			and pname like concat("%", #{cri.keyword} ,"%")
+		</if>
+	</select>
+
+	<select id="getName" resultType="string">
+		select pname from tbl_product
+		where pno>0
+	</select>
+
+	<update id="updateQuestionReplyCnt">
+		update tbl_product set questionreplycnt =
+		questionreplycnt + #{amount}
+		where pno = #{pno}
+	</update>
+
+	<update id="updateReviewReplyCnt">
+		update tbl_product set reviewreplycnt =
+		reviewreplycnt + #{amount}
+		where pno = #{pno}
+	</update>
+
+	<update id="permit" parameterType="map">
+		update tbl_product
+		<if test='permit == "O"'>
+			set state = 'O'
+		</if>
+		<if test='permit == "X"'>
+			set state = 'X'
+		</if>
+		where pno = #{pno}
+	</update>
+
+	<select id="totalProduct" resultType="int">
+		select count(*)
+		from tbl_product
+		where pno > 0 and del='N'
+		<if test="sno != null">
+			and sno=#{sno}
+		</if>
+	</select>
+</mapper>

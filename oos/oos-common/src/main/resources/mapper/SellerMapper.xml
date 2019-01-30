@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.oos.mapper.SellerMapper">
+	<resultMap type="org.oos.domain.SellerAuthVO" id="Auth">
+		<result column="ano" property="ano" />
+		<result column="auth" property="auth" />
+	</resultMap>
+	
+	<resultMap type="org.oos.domain.SellerVO" id="Seller">
+		<result column="sid" property="sid" />
+		<result column="sname" property="sname" />
+		<result column="spw" property="spw" />
+		<result column="bnum" property="bnum" />
+		<result column="pnum" property="pnum" />
+		<result column="regdate" property="regdate" />
+		<result column="updatedate" property="updatedate" />
+		<result column="del" property="del" />
+		<collection property="authList" resultMap="Auth" />
+	</resultMap>
+		
+	<select id="getSellerList" resultMap="Seller">
+		select *  from tbl_seller s
+		left join tbl_seller_auth a
+		on s.sid = a.sid
+		where s.sid != ""
+		and s.sid !="admin"
+		and auth is not null
+		<if test="dto != null">
+		
+			<if test="dto.cri.keyword != null">
+				and s.sname like concat("%", #{dto.cri.keyword} ,"%")
+			</if>
+			
+			<if test="dto.cri.category != null">
+				and auth = #{dto.cri.category}
+			</if>
+			
+			order by regdate desc
+			limit #{dto.cri.skip}, #{dto.cri.amount}
+		</if>
+	</select>
+	
+	<select id="getSellerCount" resultType="int">
+		select count(*)  from tbl_seller s
+		left join tbl_seller_auth a
+		on s.sid = a.sid
+		where s.sid != ""
+		<if test="keyword != null">
+			and s.sid like concat("%", #{keyword} ,"%")
+		</if>
+	</select>
+	
+	<select id="get" resultType="org.oos.domain.SellerVO">
+		select * from tbl_seller
+		where sid = #{sid} 
+	</select>
+	
+	<insert id="insert">
+		insert into tbl_seller(sid,spw,sname,bnum,pnum) values(#{sid},#{spw},#{sname},#{bnum},#{pnum})
+	</insert>
+	
+	<update id="modify">	
+		update tbl_seller set spw = #{spw}, sname = #{sname}, bnum = #{bnum}, pnum = #{pnum}, updatedate = now()
+		 where sid = #{sid}		
+	</update>
+	
+	
+	<update id="delete">	
+		update tbl_seller set del='Y' where sid = #{sid}	
+	</update>
+		<update id="addSno">	
+		update tbl_seller set sno=#{sno} where sid = #{owner}	
+	</update>
+	<update id="authorize">	
+		update tbl_seller set permit='Y' where sid = #{sid}	
+	</update>
+	
+	
+	<update id="changeAutority" parameterType="map">
+		update tbl_seller_auth 
+		set auth = #{auth}
+		where sid =#{sid}
+	</update>
+	
+	<select id="unapprovedCount" resultType="int">
+		select count(*) from tbl_seller_auth where auth = 'none' and ano >0;
+	</select>
+	
+	<select id="banCount" resultType="int">
+		select count(*) from tbl_seller_auth where auth = 'ban' and ano >0;
+	</select>
+	
+	<select id="currentSeller" resultType="int">
+		select count(*) from tbl_seller_auth where auth = 'seller' and ano >0;
+	</select>
+	
+	
+	<select id="getBySid" resultMap="Seller">
+	select * from tbl_seller s left join tbl_seller_auth a
+		on s.sid =a.sid
+		where
+		s.sid = #{sid}
+	</select>
+	
+	
+</mapper>

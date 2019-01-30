@@ -1,0 +1,152 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/sellerLayout}">
+
+
+<div class="container" style="margin-top: 20px;"
+	layout:fragment="container">
+<style>
+.btn{
+	margin:0 5px 5px 0;
+}
+
+.on{
+	background:#ccc
+}
+
+#tagBox{
+	max-height:350px;
+	overflow:scroll;
+}
+</style>
+	<h1 align='center'>해시태그관리</h1>
+	<br />
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="panel panel-default">
+                 <div class="panel-heading">
+                    	 해시태그
+                 </div>
+                 <!-- /.panel-heading -->
+                 <div class="panel-body">
+                     <p id="tagBox">
+                   		<button th:each="arr:${tagList}" type="button" 
+                   		th:id="${arr.tag}" th:data-hno="${arr.hno}" th:text="|#${arr.tag}|"
+                   		class="btn btn-default">TAG</button>
+                     </p>
+                      <p class="help-block" style="display:inline-block">
+                      		태그검색은 Ctrl + F 를 이용해주세요.</p>
+                    	 <button type="button" style="float:right"
+                    	 class="btn disabled btn-sm btn-warning">태그 삭제</button>
+                 </div>
+             </div>
+             <div class="form-group has-success" style="margin: 0 auto;width:500px;">
+	            <label class="control-label" for="inputTag">태그입력</label>
+	            <input type="text" class="form-control" id="inputTag">
+	            <p class="help-block">쉼표(,)로 여러개의 태그를 입력할 수 있습니다.<br>
+	            		띄어쓰기 없이 입력해주세요.</p>
+	            <p class="help-block" id="warnP"
+	            style="color:red; display:none">쉼표(,)로 여러개의 태그를 입력할 수 있습니다.</p>		
+	        </div>
+	        <button type="button" id="tagBtn" style="margin: 30px auto;width:500px;"
+	        class="btn btn-success btn-lg btn-block">태그 등록</button>
+		</div>
+	</div>
+	
+</div>
+
+
+<script src="/js/jquery.min.js"></script>
+<th:block layout:fragment="script">
+<script th:inline="javascript">
+
+$(document).ready(function(){
+	
+	var tagDelList = new Array();
+	
+	$(document).on('click', "#tagBtn" , function(){
+		var tag = $("#inputTag").val();
+		var tagAddList = tag.split(",");
+		$.each(tagAddList,function(index, item){
+			if(document.getElementById(item) != null){
+				$("#warnP").html(item +" 태그는 이미 존재합니다");
+				$("#warnP").show();				
+				throw "stop";
+			}
+			
+		});
+		
+		$.ajax({
+			type:"post",
+			url:"/admin/addTag/"+encodeURI(tag),
+			beforeSend: function(xhr) {
+	            xhr.setRequestHeader(header, token);
+	        },
+            success:function(result, status, xhr){
+            	tagReload();
+            	$("#warnP").html("")
+            				.hide();
+			}
+		});
+	});
+	
+	$(document).on('click', ".btn-default" , function(e){
+		if($(e.target).hasClass("on")){
+			$(e.target).removeClass("on")
+		}else{
+			$(e.target).addClass("on")
+		}
+		
+		$.each($(".btn-default"),function(index, item){
+			
+			if($(this).hasClass("on")){
+				$(".btn-warning").removeClass("disabled");
+				return false;
+			}
+			
+			$(".btn-warning").addClass("disabled");
+		});
+	});
+	
+	
+	$(document).on('click', ".btn-warning" , function(){
+		$.each($(".btn-default"),function(index, item){
+			if($(this).hasClass("on")){
+				tagDelList.push($(this).data("hno"));
+			}
+		});
+		
+		$.ajax({
+			data:{'tagArray' : tagDelList},
+			type:"post",
+			traditional : true,	//배열 ajax로 넘길때
+			url:"/admin/deleteTag",
+			beforeSend : function(xhr){
+				xhr.setRequestHeader(header, token);
+			},
+            success:function(result, status, xhr){
+            	tagReload();
+			}
+		});
+	});
+	
+	$("#inputTag").keydown(function(e){
+		
+		
+		if (e.keyCode == 32) { 
+	       $(this).val($(this).val() + ""); 
+	       return false;
+		}
+		
+	});
+	
+	function tagReload(){
+		$("#inputTag").val("");
+    	$(".panel-body").load(location.href + " .panel-body>*","");
+	}
+	
+});
+
+</script>
+</th:block>
+</html>

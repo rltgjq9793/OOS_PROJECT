@@ -1,0 +1,142 @@
+<!DOCTYPE>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>상품 상세정보</title>
+
+</head>
+<link href="/css/nanumbarungothic.css" type="text/css" rel="stylesheet">
+<link href="/css/common.css" type="text/css" rel="stylesheet">
+<link href="/css/custom_bootstrap.css" type="text/css" rel="stylesheet" />
+<style>
+input[type="checkbox"]{
+	display:unset;
+}
+</style>
+<script src="/js/jquery.min.js"></script>
+<body>
+	<div class="myPageContentArea" style="position: relative; width: 460px; min-height: 400px; margin:20px auto;">
+		
+ 		<div class="wishlistArea">
+			<div style="font-size: 20px; color: #202225; height: 40px;">스토어 공지</div>
+
+			<table class="myPageSheetTable" cellspacing="0" style="width: 100%;margin-bottom:30px;">
+				<colgroup>
+					<col width="350">
+					<col width="80">
+				</colgroup>
+				<thead>
+					<tr style="background-color: #fff; padding: 0px; text-align: center;'">						
+						<th class="">제목</th>						
+						<th class="">등록일</th>
+					</tr>
+				</thead>
+				<tbody id="questionlist_tbody">
+					<tr class="height60" th:each="arr:${popupList}" style="text-align: center;">						
+						<td class="replyTitle"><a class="move" th:href="${arr.sbno}" th:text=${arr.title}></a></td>				
+						<td class="" th:text="${#dates.format(arr.updatedate,'yyyy-MM-dd')}"></td>
+				</tbody>
+			</table>
+			
+			<div style="text-align:center;" th:if="${#lists.size(pageList) gt 1}">
+				<div class="pageControlLeft" th:if="${pageMaker.prev} == true"></div>
+				<div class="showPage" style="display:inline-block; vertical-align:top;"  th:each="page : ${pageList}">
+					<button class="pageNum pageNumber" th:id="|page_${page}|" th:text="${page}">1</button></div>
+				<div class="pageControlRight" th:if="${pageMaker.next} == true"></div>
+			</div>
+			
+		<form name="frm" method="post" action="">
+		 <div style="vertical-align:middle; display:inline-block; margin-bottom:2px;">		
+		
+         <div style="font-size:11px;"> 
+         	<input class="PopupCheck" type="checkbox" name="pop">1일동안 이 창을 열지 않음
+         	<a id="closeBtn"  href="#" onfocus="this.blur()">[닫기]</a>
+         </div>
+		</div>
+		</form>
+		</div>
+		</div>
+		
+		
+	
+<form id="notifyForm">
+		<input type='hidden' name='amount' th:value='${pageMaker.cri.amount}' />
+		<input type='hidden' id='pageNum' name='pageNum' th:value='${pageMaker.cri.pageNum}' />
+		<input type='hidden' name='sid' th:value='${seller.sid}'/>
+</form>
+
+<script src="/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="/js/function.js" type="text/javascript"></script>
+<script src="/js/menuhover.js" type="text/javascript"></script>
+
+<script src="/js/jquery.min.js"></script>
+<th:block layout:fragment="script">
+<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+	<script th:inline="javascript">
+
+$(document).ready(function(){
+	
+	var notifyForm = $("#notifyForm");
+	var popupList =[[${popupList}]];
+	  	  
+	$(".move").on("click",function(e){
+		
+		console.log("click...");
+		e.preventDefault();
+		notifyForm.append("<input type='hidden' name='sbno' value='"+$(this).attr("href")+"' >");
+		notifyForm.attr("action","/store/popup");
+		notifyForm.submit();
+	});
+	
+
+	var cookieList = function(cookieName) {
+		
+
+		var cookie = $.cookie(cookieName);
+		var items = cookie ? cookie.split(/,/) : new Array();
+
+		return {
+		    "add": function(val) {
+		        items.push(val);
+		        $.cookie(cookieName, items.join(','),{ expires: 1});
+		    }/* ,
+		    "remove": function (val) { 
+		        
+		        indx = items.indexOf(val); 
+		        if(indx!=-1) items.splice(indx, 1); 
+		        $.cookie(cookieName, items.join(','));
+			 },
+		    "clear": function() {
+		        items = null;
+		        $.cookie(cookieName, null);
+		    },
+		    "items": function() {
+		        
+		        return items;
+		    } */
+		  }
+		}  
+			
+	//console.log(popupList[0].sno);
+	 
+		$("#closeBtn").click(function (e){
+			e.preventDefault();
+	        if (document.frm.pop.checked){
+	        	console.log(popupList[0].sno)
+	        			        	
+	        	cookieList('popupOpen').add(popupList[0].sno);     	
+	        					
+	        }
+	   
+	   self.close();
+	});
+	        		
+	     console.log(popupList);   		
+	
+});
+	
+		
+	</script>
+</th:block>	
+</body>
+</html>

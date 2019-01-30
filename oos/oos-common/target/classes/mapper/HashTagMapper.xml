@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.oos.mapper.HashTagMapper">
+		
+	 <select id="getName" resultType="String">
+         select tag from tbl_hashtag
+         where hno>0 and del = 'N'
+     </select>
+     
+     <select id="getList" resultType="org.oos.domain.HashTagVO">
+         select * from tbl_hashtag
+         where hno>0 and del = 'N'
+     </select>
+     
+     <insert id="insert">
+         insert into tbl_hashtag(tag)
+         value(#{tag})
+     </insert>
+     
+     <delete id="delete">
+         delete from tbl_hashtag
+         where hno = #{hno}
+     </delete>
+     
+    <insert id="insertStore">
+		insert into tbl_store_hashTag(sno,hno,tag)
+		values (#{sno},#{hno},#{tag})
+	</insert>
+	
+	<select id="getStoreTagList" resultType="org.oos.domain.StoreHashTagVO">
+		select *
+		from tbl_store_hashTag
+		where shno>0 and sno=#{sno}
+	</select>
+	
+     <delete id="deleteAll">
+        delete from tbl_store_hashTag
+        where sno = #{sno}
+    </delete>
+     
+</mapper>

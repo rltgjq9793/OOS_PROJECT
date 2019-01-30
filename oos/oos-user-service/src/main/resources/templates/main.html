@@ -1,0 +1,234 @@
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{/layout/shopLayout}">
+ 
+<div class="container"
+    style="margin-top: 0px; width: 100% !important; min-width: 1100px;"
+    layout:fragment="container">
+    
+    <link rel="stylesheet" href="/css/imgSlider.css">
+    <link rel="stylesheet" href="/css/submain.css">
+    <div id="banner" class="banner">
+        <ul>
+            <li><img src="http://mutnam.com/web/main/pc/181217_main1.gif"
+                alt=""></li>
+            <li><a href="/store/detail?pno=78"><img src="http://mutnam.com/web/main/pc/181211_main5.jpg"
+                alt=""></a></li>
+            <li><a href="/store/detail?pno=37"><img src="http://mutnam.com/web/main/pc/181211_main2-1.jpg"
+                alt=""></a></li>
+            <li><a href="/store/detail?pno=128"><img src="http://mutnam.com/web/main/pc/181211_main6.jpg"
+                alt=""></a></li>
+            <li><a href="/store/detail?pno=26"><img src="http://mutnam.com/web/main/pc/181211_main3.jpg"
+                alt=""></a></li>
+            <li><a href="/store/detail?pno=30"><img src="http://mutnam.com/web/main/pc/181226_main6.jpg"
+                alt=""></a></li>
+        </ul>
+    </div>
+    <script src="/js/jQuery.autoSlider.js"></script>
+    <script>
+        $(function() {
+            $('.banner').autoSlider({
+                speed : 800,
+                delay : 3000,
+                dots : true,
+                stay : true,
+                fluid : true
+            });
+        });
+    </script>
+    <div style="margin: 0 auto; width: 1100px !important">
+        <div class="todaySinsang" style="margin: 40px 0 30px 0;">
+            <span style="background-color: #fff; padding: 0 10px;">베스트 상품</span>
+            <div class="div_line_grey_2px"
+                style="margin-top: -8px; margin-bottom: 16px;"></div>
+        </div>
+        <div id="hp_best" class="hp_best hp_galley_st">
+            <div id="touchSlider_best" class="touchSlider-box">
+                <div class="touchSlider" id="bestItemList">
+                    <ul class="item-list-img">
+                        <li th:each="arr,index : ${bestP}">
+                        <div th:text="${index.count}"
+                        style="padding:0 0 5px 25px; font-size:14px; font-weight:bold">index</div>
+                            <a class="showcase_con" th:data-sno="${arr.sno}"> 
+                                <span class="showcase_img">
+                                    <img class="item_img lazy" th:id="|bestP_${arr.pno}|" 
+                                    style="display: inline;"> 
+                                </span> 
+                                <span class="showcace_info"> 
+                                    <span class="text_type1" th:text="${arr.pname}">
+                                        PNAME</span><em th:text="${arr.price}">PRICE</em>
+                                </span>
+                            </a> 
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+    <div class="todaySinsang" style="margin: 40px 0 30px 0;">
+            <span style="background-color: #fff; padding: 0 10px;">베스트 상점</span>
+            <div class="div_line_grey_2px"
+                style="margin-top: -8px; margin-bottom: 16px;"></div>
+        </div>
+        <div class="item_list_wrap"
+            style="display: block; width: 980px; margin: 0 auto">
+            <ul class="item_list">
+                <li th:each="arr : ${bestS}">
+                    <div class="inner">
+                        <div style="height:180px; overflow:hidden">
+                            <img class="thumb" th:id="|bestS_${arr.sno}|" style="display: inline;"> 
+                            <span class="title" th:text="${arr.sname}">SNAME</span>
+                        </div>
+                        <div class="info">
+                            <span class="tags"> 
+                                <span class="tag" th:text="${arr.tel}">TEL</span>
+                                <!-- <span class="tag">
+                                    <span class="ico_bar"></span>臾대즺諛곗넚
+                                </span> -->
+                            </span>
+                            <span class="option">
+                                <span class="buy">援щℓ 
+                                    <strong th:text="${arr.odNum}">odNum</strong>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+        </div>
+        <div class="todaySinsang" style="margin: 40px 0 30px 0;">
+            <span style="background-color: #fff; padding: 0 10px;">맞춤 추천상품</span>
+            <div class="div_line_grey_2px"
+                style="margin-top: -8px; margin-bottom: 16px;"></div>
+        </div> 
+        <div class="today_left_area"
+            style="background-color: #e3e0e8; width: 1100px; padding:10px 0">
+            <ul class="goods_list_t1 goods_list_t6 ul_3col">
+                <li th:each="arr:${recommend}" style="cursor:pointer">
+                    <a th:href="|/store/detail?pno=${arr.pno}|">
+                        <span class="img_wrap_t19"> 
+                            <img th:id="|recommend_${arr.pno}|" style="display: inline;">
+                        </span> 
+                        <strong class="goods_title_08" th:text="${arr.pname}">PNAME</strong> 
+                        <span class="goods_price_04" th:text="${arr.price}">PRICE
+                            <em class="font_14 font_normal">�썝</em>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="todaySinsang" style="margin-top: 76px;">
+            <span style="background-color: #fff; padding: 0 10px;">오늘의 신상</span>
+            <div class="div_line_grey_2px"
+                style="margin-top: -8px; margin-bottom: 16px;"></div>
+        </div>
+        <div class="item_list_wrap"style="width: 1100px; margin: 0 auto;">
+                <ul id="goodsList" style="padding: 0px;">
+                    <ul class="goods_ul" th:each="arr :${product}" >
+                        <li th:class="|goodsContainer store_${arr.sno}|"
+                            style="margin-right: 5px;" th:id="|link_${arr.pno}|">
+                            <div class="goodsImg"
+                                style=" position: relative; overflow:hidden; width: 270px; height: 353px;">
+                                <img th:id="|img_${arr.pno}|" class="productImg"
+                                    style="width: 98%;position:absolute;
+                                    overflow:hidden; right:2px;
+                                    top:0;bottom:50px;margin:auto;">
+                            </div>
+                            <div class="goodsInfo" style="position: relative;">
+                                <div class="goodsName" th:text="${arr.pname}" style="">PNAME</div>
+                            <div class="storeLocation"
+                                    style="font-size: 13px; color: #9b9b9b; margin-top: 4px;"
+                                    th:text="${arr.sname}">SNAME</div> 
+                            </div>
+                            <div style="margin: 0 15px;">
+                                <span
+                                    style="float: right; font-size: 20px; font-weight: bold; margin-top: 7px;"
+                                    th:text="${arr.price}">PRICE</span>
+                            </div> <span class="mouseOverBorder"></span>
+                        </li>
+                    </ul>
+                </ul>
+            </div>
+        <form id="mainForm"></form>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+    $(document).ready(function() {
+        var mainForm = $("#mainForm");
+    
+        (function(){
+        	var mobileKeyWords = new Array('iPhone', 'iPod', 'BlackBerry', 'Android', 'Windows CE', 'Windows CE;', 'LG', 'MOT', 'SAMSUNG', 'SonyEricsson', 'Mobile', 'Symbian', 'Opera Mobi', 'Opera Mini', 'IEmobile');
+
+        	for (var word in mobileKeyWords){
+        	    if (navigator.userAgent.match(mobileKeyWords[word]) != null){
+        	       window.location.href = "/m/main";
+        	        break;
+        	    }
+        	}
+        	
+            var bestP =  [[${bestP}]];
+            var bestS =  [[${bestS}]];
+            var product = [[${product}]];
+            var recommend = [[${recommend}]];
+            
+            $.each(product, function(index, item){
+                var img = item.imgList[0];
+                var fileCallPath =  encodeURIComponent(img.ipath+"/"+img.uuid +"_"+img.iname);
+                $("#img_"+item.pno).attr("src","/display?fileName="+fileCallPath);
+            }); 
+            
+            $.each(bestP, function(index, item){
+                var img = item.imgList[0];
+                var fileCallPath =  encodeURIComponent(img.ipath+"/"+img.uuid +"_"+img.iname);
+                $("#bestP_"+item.pno).attr("src","/display?fileName="+fileCallPath);
+            }); 
+            
+            $.each(bestS, function(index, item){
+                var img = item.imgList[0];
+                var fileCallPath =  encodeURIComponent(img.ipath+"/"+img.uuid +"_"+img.iname);
+                $("#bestS_"+item.sno).attr("src","/display?fileName="+fileCallPath);
+            }); 
+            
+            if(recommend){
+                $.each(recommend, function(index, item){
+                    var img = item.imgList[0];
+                    var fileCallPath =  encodeURIComponent(img.ipath+"/"+img.uuid +"_"+img.iname);
+                    $("#recommend_"+item.pno).attr("src","/display?fileName="+fileCallPath);
+                });
+            }
+            
+        })();
+        
+        $(".item_list .inner").click(function(){
+            
+            mainForm.append("<input type='hidden' name='sno' value='"+
+                    $(this).find(".thumb").attr("id").substring(6)+"'>")
+                    .attr("action","/store/list").submit();
+        });
+        
+        $(".showcase_con").click(function(){
+            mainForm.append("<input type='hidden' name='pno' value='"+
+                            $(this).find("img").attr("id").substring(6)+"'>")
+                            
+                    .attr("action","/store/detail").submit();
+        });
+        
+        $("#goList").click(function() {
+            window.location.href = "/user/list";
+        });
+    
+        $(".goodsContainer").click(
+            function(e) {
+                var pno = $(this).attr("id")
+                        .substring(5);
+                var sno = $(this).attr("class")
+                        .substring(21);
+                mainForm.append("<input type='hidden' name='pno' value='"+pno+"'>");
+                mainForm.attr("action","/store/detail").submit();
+            });
+        });
+    </script>
+</th:block>
+</html>
